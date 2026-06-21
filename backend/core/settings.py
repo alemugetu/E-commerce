@@ -35,6 +35,11 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
+import os
+
+PUBLIC_KEY = os.getenv('PUBLIC_KEY')
+CHAPA_SECRET_KEY = os.getenv('CHAPA_SECRET_KEY')
+ENCRYPTION_KEY = os.getenv('ENCRYPTION_KEY')
 
 # Application definition
 
@@ -49,7 +54,8 @@ INSTALLED_APPS = [
     #Third party dependencies ecosystem
     'rest_framework',
     'rest_framework_simplejwt',
-    'corsheaders'
+    'corsheaders',
+     'django_filters',
 
     #Local module micro_APPS
     'apps_auth',
@@ -77,6 +83,16 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
+    #  THESE TWO LINES FOR PAGINATION ---
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 12, # Sends 12 products per page (perfect for a 3-column or 4-column React grid)
+
+     'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+
 }
 
 # --- SIMPLE JWT CONFIGURATION ---
