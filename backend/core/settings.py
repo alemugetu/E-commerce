@@ -29,17 +29,25 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
-
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
 
 import os
-
-PUBLIC_KEY = os.getenv('PUBLIC_KEY')
-CHAPA_SECRET_KEY = os.getenv('CHAPA_SECRET_KEY')
-ENCRYPTION_KEY = os.getenv('ENCRYPTION_KEY')
+PUBLIC_KEY = env('PUBLIC_KEY')
+CHAPA_SECRET_KEY = env('CHAPA_SECRET_KEY')
+ENCRYPTION_KEY = env('ENCRYPTION_KEY')
 
 # Application definition
 
@@ -65,6 +73,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -104,7 +113,7 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': True,
 
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': os.getenv('SECRET_KEY', 'fallback-development-key-12345'),
+   # 'SIGNING_KEY': os.getenv('SECRET_KEY', 'fallback-development-key-12345'),
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': None,

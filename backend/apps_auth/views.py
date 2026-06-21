@@ -3,6 +3,9 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
+import logging
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -16,8 +19,10 @@ class RegisterView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
+        phone_number = request.data.get('phone_number')
         first_name = request.data.get('first_name', '')
         last_name = request.data.get('last_name', '')
+        addresse = request.data.get('addresse')
 
         #  Structural Sanity Checks
         if not email or not password:
@@ -45,8 +50,10 @@ class RegisterView(APIView):
             user = User.objects.create_user(
                 email=email,
                 password=password,
+                phone_number=phone_number,
                 first_name=first_name,
-                last_name=last_name
+                last_name=last_name,
+                addresse=addresse
             )
 
             #  Programmatically Generate a Fresh Token Bundle
@@ -57,6 +64,7 @@ class RegisterView(APIView):
                 "user": {
                     "id": user.id,
                     "email": user.email,
+                    "phone_number": user.phone_number,
                     "first_name": user.first_name,
                     "last_name": user.last_name
                 },
@@ -67,8 +75,11 @@ class RegisterView(APIView):
             }, status=status.HTTP_201_CREATED)
 
         except Exception as e:
+            # INTERNAL LOGGING ONLY
+            logger.exception("User registration failed")
+
             return Response(
-                {"error": f"An unexpected system failure occurred: {str(e)}"},
+                {"error": "Registration failed. Please try again later."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
