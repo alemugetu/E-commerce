@@ -15,7 +15,7 @@ def fulfill_order_pipeline(order_id: int) -> Order:
         )
 
         # Idempotency
-        if order.is_paid or order.status == 'paid':
+        if order.is_paid or order.status == 'Paid':
             return order
 
         # 🔥 USE SNAPSHOT ONLY (NO CART)
@@ -29,16 +29,16 @@ def fulfill_order_pipeline(order_id: int) -> Order:
             product = Product.objects.select_for_update().get(id=item.product_id)
 
             # stock validation
-            if product.stock_quantity < item.quantity:
+            if product.stock < item.quantity:
                 raise ValidationError(
                     f"Insufficient stock for {product.name}"
                 )
 
-            product.stock_quantity -= item.quantity
+            product.stock -= item.quantity
             product.save()
 
         order.is_paid = True
-        order.status = 'paid'
+        order.status = 'Paid'
         order.save()
 
         return order

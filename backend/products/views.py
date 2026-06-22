@@ -112,6 +112,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                 is_available=True
             ).select_related(
                 'category'
+            ).prefetch_related(
+                'images'
             ).order_by(
                 '-created_at'
             )
@@ -120,4 +122,6 @@ class ProductViewSet(viewsets.ModelViewSet):
             is_available=True
         ).select_related(
             'category'
+        ).prefetch_related(
+            'images'
         )

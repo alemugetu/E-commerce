@@ -7,8 +7,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from orders.models import Cart, Order
+from django.core.exceptions import ValidationError
+from orders.models import Cart, Order, OrderItem
 from orders.services import fulfill_order_pipeline  
+from products.models import Product
 import requests # type: ignore
 import uuid
 from chapa import Chapa # pyright: ignore[reportMissingImports]
@@ -31,14 +33,46 @@ class CreateChapaCheckoutView(APIView):
 
         tx_ref = str(uuid.uuid4())
 
-        # 1. CREATE ORDER FIRST (NO EXTERNAL CALL INSIDE TRANSACTION)
-        order = Order.objects.create(
-            user=user,
-            total_amount=total_amount,
-            tx_ref=tx_ref,
-            status="pending",
-            is_paid=False
-        )
+        # 1. VALIDATE STOCK & CREATE ORDER WITH SNAPSHOT INSIDE TRANSACTION
+        try:
+            with transaction.atomic():
+                # Fetch cart items with product details
+                cart_items = cart.items.select_related('product').all()
+                
+                if not cart_items.exists():
+                    return Response({"error": "Cart is empty"}, status=400)
+                
+                # Validate stock availability BEFORE creating order
+                for item in cart_items:
+                    product = item.product
+                    if product.stock < item.quantity:
+                        return Response(
+                            {"error": f"Insufficient stock for {product.name}. Available: {product.stock}, Requested: {item.quantity}"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                
+                # Create pending order
+                order = Order.objects.create(
+                    user=user,
+                    total_amount=total_amount,
+                    tx_ref=tx_ref,
+                    status="Pending",
+                    is_paid=False
+                )
+                
+                # Create OrderItem snapshots from cart items
+                for item in cart_items:
+                    OrderItem.objects.create(
+                        order=order,
+                        product=item.product,
+                        quantity=item.quantity,
+                        price_at_purchase=item.product.get_effective_price
+                    )
+                
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": "Error creating order. Please try again."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # 2. CALL CHAPA OUTSIDE TRANSACTION
         try:
@@ -98,25 +132,42 @@ class ChapaWebhookView(APIView):
         url = f"https://api.chapa.co/v1/transaction/verify/{tx_ref}"
         headers = {"Authorization": f"Bearer {settings.CHAPA_SECRET_KEY}"}
 
-        resp = requests.get(url, headers=headers)
-        data = resp.json()
+        try:
+            resp = requests.get(url, headers=headers, timeout=10)
+            data = resp.json()
+        except Exception as e:
+            return Response({"error": "Payment verification failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         if resp.status_code != 200 or data.get("status") != "success":
-            return Response({"error": "Payment not verified"}, status=400)
+            return Response({"error": "Payment not verified"}, status=status.HTTP_400_BAD_REQUEST)
 
-        payment_amount = Decimal(data["data"]["amount"])
+        payment_amount = Decimal(str(data.get("data", {}).get("amount", 0)))
 
         # 💰 AMOUNT INTEGRITY CHECK
         if payment_amount != order.total_amount:
-            return Response({"error": "Amount mismatch"}, status=400)
+            return Response({"error": "Amount mismatch"}, status=status.HTTP_400_BAD_REQUEST)
 
         # 🎯 FINALIZE ORDER SAFELY
-        with transaction.atomic():
-            order.is_paid = True
-            order.status = "paid"
-            order.save()
+        try:
+            with transaction.atomic():
+                order.is_paid = True
+                order.status = "Paid"
+                order.save()
 
-            fulfill_order_pipeline(order.id)
+                # Fulfill the order (reduce inventory)
+                fulfill_order_pipeline(order.id)
+                
+                # Clear user's cart after successful payment
+                cart = Cart.objects.filter(user=order.user).first()
+                if cart:
+                    cart.items.all().delete()
+
+            return Response({"message": "Payment verified and order finalized"}, status=status.HTTP_200_OK)
+            
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": "Error finalizing order"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"message": "Payment verified"}, status=200)
     

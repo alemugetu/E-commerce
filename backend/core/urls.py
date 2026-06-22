@@ -9,5 +9,7 @@ urlpatterns = [
     #This line to map the catalog engine
     path('api/products/', include('products.urls')),
     #For the cart API
-    path('api/orders', include('orders.urls')),
+    path('api/orders/', include('orders.urls')),
+    #For payments
+    path('api/payments/', include('payments.urls')),
 ]

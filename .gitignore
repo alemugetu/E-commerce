@@ -1,0 +1,20 @@
+# Environment variables containing sensitive keys and DB passwords
+.env
+.env.local
+
+# Django sensitive files
+db.sqlite3          # (Just in case you used it for local testing)
+*.pyc
+__pycache__/
+media/              # (User-uploaded media files like product images)
+staticfiles/        # (Collected static files)
+
+# Python Virtual Environments
+venv/
+.venv/
+env/
+
+# OS/IDE specific files
+.vscode/
+.idea/
+.DS_Store

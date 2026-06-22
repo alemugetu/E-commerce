@@ -35,7 +35,20 @@ class CartAPIView(APIView):
         
         # Extract data from the React frontend's JSON payload
         product_id = request.data.get('product_id')
-        quantity = int(request.data.get('quantity', 1))
+        try:
+            quantity = int(request.data.get('quantity', 1))
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "Quantity must be a valid integer."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate quantity range
+        if quantity <= 0 or quantity > 10000:
+            return Response(
+                {"error": "Quantity must be between 1 and 10000."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Ensure the product actually exists in the database
         product = get_object_or_404(Product, id=product_id)
@@ -66,7 +79,20 @@ class CartItemDetailView(APIView):
     def patch(self, request, pk):
         # Ensure the user is only updating an item that belongs to THEIR cart
         cart_item = get_object_or_404(CartItem, id=pk, cart__user=request.user)
-        new_quantity = int(request.data.get('quantity', cart_item.quantity))
+        try:
+            new_quantity = int(request.data.get('quantity', cart_item.quantity))
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "Quantity must be a valid integer."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate quantity range
+        if new_quantity < 0 or new_quantity > 10000:
+            return Response(
+                {"error": "Quantity must be between 0 and 10000. Use 0 to remove item."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         if new_quantity <= 0:
             cart_item.delete()

@@ -80,7 +80,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'description',
             'price',
             'discount_price',
-            'stock_quantity',
+            'stock',
             'is_available',
             'images',
             'rating',

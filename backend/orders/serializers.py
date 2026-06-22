@@ -64,9 +64,9 @@ class OrderItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'product_name', 'quantity', 'price']
+        fields = ['id', 'product', 'product_name', 'quantity', 'price_at_purchase']
         # The price is the historical snapshot price, it should never be edited via API
-        read_only_fields = ['price']
+        read_only_fields = ['price_at_purchase']
 
 class OrderSerializer(serializers.ModelSerializer):
     # Nested serializer to pull in all items attached to this order
@@ -79,7 +79,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'user', 
             'total_amount', 
             'status', 
-            'stripe_session_id', 
+            'tx_ref',
             'created_at', 
             'updated_at',
             'items'
@@ -89,7 +89,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'user', 
             'total_amount', 
             'status', 
-            'stripe_session_id'
+            'tx_ref'
         ]        
 
         
