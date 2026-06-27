@@ -31,7 +31,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
 
         if self.action == 'list':
-            return queryset.filter(parent=None, is_available=True)
+            return queryset.filter(parent=None)
 
         return queryset
 
@@ -125,3 +125,5 @@ class ProductViewSet(viewsets.ModelViewSet):
         ).prefetch_related(
             'images'
         )
+    
+    

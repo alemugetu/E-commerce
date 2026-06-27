@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from products.models import Product
 
+
 class Cart(models.Model):
     """
     Master cart container uniquely tied to a specific user.
@@ -100,8 +101,7 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     tx_ref = models.CharField(max_length=266, unique=True)
     
-    # Stripe Gateway Details
-   # stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
+   
     is_paid = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)

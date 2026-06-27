@@ -3,7 +3,9 @@ from .views import (
     CartAPIView, 
     CartItemDetailView,
     WishlistDetailView,
-    WishlistToggleItemView
+    WishlistToggleItemView,
+    UserOrderHistoryView
+    
 )
 
 
@@ -19,6 +21,12 @@ urlpatterns = [
     # Wishlist Endpoints
     path('wishlist/', WishlistDetailView.as_view(), name='wishlist-detail'),
     path('wishlist/toggle/<int:product_id>/', WishlistToggleItemView.as_view(), name='wishlist-toggle'),
+
+    #Order history view 
+    # Orders
+    # =====================
+    path("order-history/", UserOrderHistoryView.as_view(), name="order-history"),
+
 
 
 ]

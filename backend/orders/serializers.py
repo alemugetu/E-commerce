@@ -59,18 +59,41 @@ class WishlistSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'items', 'created_at']
         read_only_fields = ['user']  # Security: Prevent clients from reassigning list ownership    
 class OrderItemSerializer(serializers.ModelSerializer):
-    # Fetching helpful metadata so React doesn't just get a blank 'product ID'
     product_name = serializers.ReadOnlyField(source='product.name')
+    product_image = serializers.SerializerMethodField()
+    subtotal = serializers.SerializerMethodField()
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'product_name', 'quantity', 'price_at_purchase']
-        # The price is the historical snapshot price, it should never be edited via API
+        fields = [
+            'id', 
+            'product', 
+            'product_name', 
+            'product_image', 
+            'quantity', 
+            'price_at_purchase',
+            'subtotal'
+        ]
         read_only_fields = ['price_at_purchase']
 
+    def get_product_image(self, obj):
+        # Safely extracts the primary thumbnail image while respecting the request context for absolute URLs
+        request = self.context.get('request')
+        if obj.product and hasattr(obj.product, 'images'):
+            first_image = obj.product.images.first()
+            if first_image and hasattr(first_image, 'image'):
+                if first_image.image:
+                    return request.build_absolute_uri(first_image.image.url) if request else first_image.image.url
+        return "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=60"
+
+    def get_subtotal(self, obj):
+        # Natively handles immutable snapshot multiplications cleanly
+        return obj.quantity * obj.price_at_purchase
+
+
 class OrderSerializer(serializers.ModelSerializer):
-    # Nested serializer to pull in all items attached to this order
     items = OrderItemSerializer(many=True, read_only=True)
+    formatted_date = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -82,14 +105,19 @@ class OrderSerializer(serializers.ModelSerializer):
             'tx_ref',
             'created_at', 
             'updated_at',
+            'formatted_date',
             'items'
         ]
-        # Security: Almost everything on a finalized order is read-only
         read_only_fields = [
             'user', 
             'total_amount', 
             'status', 
             'tx_ref'
-        ]        
+        ]
+
+    def get_formatted_date(self, obj):
+        # Emits a clean display layout for your React interface elements
+        return obj.created_at.strftime("%b %d, %Y at %I:%M %p")
+    
 
         

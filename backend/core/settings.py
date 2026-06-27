@@ -44,7 +44,11 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 
 
-import os
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 PUBLIC_KEY = env('PUBLIC_KEY')
 CHAPA_SECRET_KEY = env('CHAPA_SECRET_KEY')
 ENCRYPTION_KEY = env('ENCRYPTION_KEY')
@@ -70,7 +74,8 @@ INSTALLED_APPS = [
     'orders',
     'products',
     'apps_products',
-    'payments'
+    'payments',
+    'custom_admin'
 ]
 
 MIDDLEWARE = [
@@ -209,3 +214,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model configuration
 AUTH_USER_MODEL = 'apps_auth.CustomUser'
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Category, Product, ProductImage
+from django.utils.text import slugify
 
 class CategorySerializer(serializers.ModelSerializer):
     """
@@ -57,36 +58,21 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    """
-    Master Serializer for Product data.
-    Embeds structural Category metadata and arrays of matching ProductImages.
-    """
-    # Explicitly pull in the primary relationship structures
     images = ProductImageSerializer(many=True, read_only=True)
-    
-    # We serialize the category detail using a shallow representation, 
-    # but keep the category ID writeable for product creation adjustments.
     category_detail = CategorySerializer(source='category', read_only=True)
 
     class Meta:
         model = Product
         fields = [
-            'id',
-            'category',
-            'category_detail',
-            'name',
-            'slug',
-            'brand',
-            'description',
-            'price',
-            'discount_price',
-            'stock',
-            'is_available',
-            'images',
-            'rating',
-            'num_reviews',
-            'created_at',
-            'updated_at'
+            'id', 'category', 'category_detail', 'name', 'slug', 'brand',
+            'description', 'price', 'discount_price', 'stock', 'is_available',
+            'images', 'rating', 'num_reviews', 'created_at', 'updated_at'
         ]
         read_only_fields = ['slug', 'created_at', 'updated_at']
 
+    # 🛠️ SENIOR FIX: Auto-populate the slug from the name before database write validation triggers
+    def create(self, validated_data):
+        if 'slug' not in validated_data or not validated_data['slug']:
+            validated_data['slug'] = slugify(validated_data['name'])
+        return super().create(validated_data)
+    

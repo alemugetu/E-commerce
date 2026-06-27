@@ -6,8 +6,10 @@ from .views import CategoryViewSet , ProductViewSet
 router = DefaultRouter()
 
 # Register the Category endpoints
+# Expose categories under `/api/products/categories/` while keeping
+# the product collection at `/api/products/` (router prefix = empty string)
 router.register(r'categories', CategoryViewSet, basename='category')
-router.register(r'products', ProductViewSet, basename='product')
+router.register(r'', ProductViewSet, basename='product')
 # Export generated routes safely to the app ecosystem
 urlpatterns = [
     path('', include(router.urls)),

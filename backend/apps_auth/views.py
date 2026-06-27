@@ -4,6 +4,15 @@ from rest_framework import status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 import logging
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UserProfileSerializer
+from .models import CustomUser
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_bytes, force_str
+from django.core.mail import send_mail
+from django.conf import settings
+from rest_framework.permissions import AllowAny
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +53,7 @@ class RegisterView(APIView):
                 {"error": "Password must contain a minimum of 8 characters."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
+ 
         try:
             #  Save New User Account using our Custom Model Manager
             user = User.objects.create_user(
@@ -83,4 +92,98 @@ class RegisterView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+
+class CustomerProfileDetailView(APIView):
+    """
+    Handles secure read and write operations for the authenticated 
+    user's personal account profile settings.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Serialize the requesting user instance directly
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        # Perform partial or complete field updates on the active user record
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+    
+class ForgotPasswordView(APIView):
+    """
+    Accepts an email address, generates a secure, timed recovery token, 
+    and sends a recovery URL to the target user account.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({"error": "Please provide a valid email address."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            # Security Best Practice: Don't explicitly reveal if an email doesn't exist
+            return Response({"message": "If this account is registered, a password reset link has been dispatched."}, status=status.HTTP_200_OK)
+
+        # Generate secure encoded identifiers
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        
+        # Build the dynamic URL pointing back to your React client layout routing
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
+        reset_link = f"{frontend_url}/reset-password/{uid}/{token}/"
+
+        # Fire email using standard Django backend email mechanisms
+        try:
+            send_mail(
+                subject="Reset Your Store Password",
+                message=f"Click the link below to securely update your credentials:\n\n{reset_link}\n\nThis link will expire shortly.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+        except Exception:
+            return Response({"error": "Email dispatcher failed. Check system SMTP profiles."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({"message": "If this account is registered, a password reset link has been dispatched."}, status=status.HTTP_200_OK)
+
+
+class ConfirmPasswordResetView(APIView):
+    """
+    Validates the uid and cryptographically signed token sent from React, 
+    then commits the new hashed password sequence.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        uidb64 = request.data.get('uid')
+        token = request.data.get('token')
+        new_password = request.data.get('new_password')
+
+        if not all([uidb64, token, new_password]):
+            return Response({"error": "Missing critical parameters required for reset execution."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Decode user primary key from base64
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = CustomUser.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+            return Response({"error": "The recovery link is invalid or corrupted."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check cryptographic token status validity against user profile state
+        if not default_token_generator.check_token(user, token):
+            return Response({"error": "The recovery link is invalid or has expired."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Encrypt and update the new credentials cleanly
+        user.set_password(new_password)
+        user.save()
+
+        return Response({"message": "Your password has been reset successfully. You may now log in."}, status=status.HTTP_200_OK)
+    
         
