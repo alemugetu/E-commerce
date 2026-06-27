@@ -1,0 +1,8 @@
+react-router-dom
+ axios
+ @tanstack/react-query
+react-hook-form
+ react-hot-toast
+ lucide-react
+
+-D tailwindcss
