@@ -87,11 +87,16 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     @property
-    def get_effective_price(self):
-        """Helper property to retrieve active promotional pricing."""
-        if self.discount_price and self.discount_price < self.price:
+    def final_price(self):
+        """Return the effective selling price after applying any discount."""
+        if self.discount_price is not None and self.discount_price < self.price:
             return self.discount_price
         return self.price
+
+    @property
+    def get_effective_price(self):
+        """Backward-compatible helper property for active promotional pricing."""
+        return self.final_price
     
 class ProductImage(models.Model):
     product = models.ForeignKey(

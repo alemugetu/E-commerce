@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '../hooks/useProducts';
-import { useCart } from '../context/CartContext'; // 1. IMPORT THE CART HOOK
+import { useAddToCart } from '../hooks/useAddToCart';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 
 const Home = () => {
   const { data: products, isLoading, isError, error } = useProducts();
-  const { addToCart } = useCart(); // 2. DESTRUCTURE THE ADD ACTION TRACER
+  const { addItem, isAdding } = useAddToCart();
 
   if (isLoading) {
     return (
@@ -102,9 +102,15 @@ const Home = () => {
                 <Button 
                   variant="primary" 
                   size="sm"
-                  onClick={() => addToCart(product, 1)}
+                  disabled={isAdding}
+                  onClick={(e) => {
+                    // Prevent the click from bubbling up into the <Link> wrapper
+                    e.preventDefault();
+                    e.stopPropagation();
+                    addItem(product, 1);
+                  }}
                 >
-                  Add to Cart
+                  {isAdding ? 'Adding…' : 'Add to Cart'}
                 </Button>
               </div>
 

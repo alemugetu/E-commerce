@@ -1,229 +1,309 @@
-import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useAdminTab } from '../context/AdminTabContext';
+import { api } from '../services/api';
+import toast from 'react-hot-toast';
 
-const AdminDashboard = () => {
-  // Navigation taccker state
-  const [activeTab, setActiveTab] = useState('overview');
-  const [selectedFile, setSelectedFile] = useState(null);
-  // State Ledger Metrics
-  const [products, setProducts] = useState([]);
+// ─── Constants ────────────────────────────────────────────────────────────────
+const INITIAL_PRODUCT_FORM = {
+  name: '', slug: '', description: '', price: '',
+  discount_price: '', stock: '', category: '', brand: '', is_available: true,
+};
+const INITIAL_ADMIN_FORM = {
+  email: '', password: '', first_name: '', last_name: '',
+  is_staff: true, is_superuser: false,
+};
+const buildSlug = (n) => n.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+const inputCls = 'w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 transition';
+const labelCls = 'mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400';
+
+// ─── Skeleton helpers ─────────────────────────────────────────────────────────
+const MetricSkeleton = () => (
+  <div className="rounded-2xl border border-slate-800 bg-slate-800/40 p-5 animate-pulse">
+    <div className="h-3 w-28 rounded bg-slate-700 mb-4" />
+    <div className="h-7 w-20 rounded bg-slate-700" />
+    <div className="h-3 w-16 rounded bg-slate-700/60 mt-2" />
+  </div>
+);
+const RowSkeleton = () => (
+  <div className="h-10 w-full animate-pulse rounded-lg bg-slate-800/60" />
+);
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB 1 — Overview (metrics cards only)
+// ══════════════════════════════════════════════════════════════════════════════
+const OverviewTab = () => {
+  const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [successMsg, setSuccessMsg] = useState("");
 
-  // Product Form Input States
-  const [formData, setFormData] = useState({
-  name: '',
-  description: '',
-  price: '',
-  discount_price: '', // Match serializer field
-  stock: '',
-  category: '',       // Writeable integer ID mapping to 'category'
-  brand: '',          // Match serializer field
-  is_available: true  // Default checkbox state
-  });
-
-  // 1. Fetch live database products on component mount
-  useEffect(() => {
-    fetchCurrentInventory();
-  }, []);
-
-  const fetchCurrentInventory = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
-      // Direct call to your standard products listing endpoint
-      const response = await api.get('/products/');
-      // Adapt based on whether your API returns a paginated envelope array or a raw array
-      setProducts(response.data.results || response.data || []);
-    } catch (err) {
-      setError("Failed to synchronize active product inventory tables.");
-    } finally {
-      setLoading(false);
-    }
-  };
+      const { data } = await api.get('/custom-admin/metrics/');
+      setMetrics(data);
+    } catch { setMetrics(null); }
+    finally { setLoading(false); }
+  }, []);
 
-  // Handle Input value changes dynamically
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  useEffect(() => { load(); }, [load]);
 
-  // 2. CREATE: Submit new product to staff management endpoint
-const handleCreateProduct = async (e) => {
-  e.preventDefault();
-  setError(null);
-  setSuccessMsg("");
-
-  try {
-    const payload = {
-      name: formData.name,
-      description: formData.description,
-      price: parseFloat(formData.price),
-      discount_price: formData.discount_price ? parseFloat(formData.discount_price) : null,
-      stock: parseInt(formData.stock, 10),
-      category: parseInt(formData.category, 10),
-      brand: formData.brand,
-      is_available: formData.is_available
-    };
-
-    // 1. Save core product metrics first
-    const productResponse = await api.post('/custom-admin/products/', payload);
-    const newProductId = productResponse.data.id;
-
-    // 2. If a file is selected, upload it immediately to the attachment route
-    if (selectedFile) {
-      const imagePayload = new FormData();
-      imagePayload.append('product', newProductId); // Links to the product ID foreign key
-      imagePayload.append('image', selectedFile);     // Appends binary asset data packet
-      imagePayload.append('is_feature', true);       // Sets default display flags
-
-      await api.post('/custom-admin/products/upload-image/', imagePayload, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-    }
-
-    setSuccessMsg(`"${productResponse.data.name}" and its primary image asset have been successfully deployed live!`);
-    
-    // Clear inputs
-    setFormData({ name: '', description: '', price: '', discount_price: '', stock: '', category: '', brand: '', is_available: true });
-    setSelectedFile(null);
-    document.getElementById('product-image-input').value = ""; // Clear file field element
-    fetchCurrentInventory();
-    
-  } catch (err) {
-    setError(err.response?.data?.error || "Error during multi-stage production provisioning cycle.");
-  }
-};
-  // 3. DELETE: Drop a product instance row out of database registry by primary key ID
-  const handleDeleteProduct = async (id) => {
-    if (!window.confirm("Are you absolutely sure you want to delete this product? This action is permanent.")) return;
-    
-    setError(null);
-    setSuccessMsg("");
-
-    try {
-      await api.delete(`/custom-admin/products/${id}/`);
-      setSuccessMsg("Product instance scrubbed from registry successfully.");
-      fetchCurrentInventory();
-    } catch (err) {
-      setError("Authorization denied or server processing error on item deletion.");
-    }
-  };
+  const cards = [
+    { label: 'Total Products', value: metrics?.total_products ?? '—', sub: `${metrics?.available_products ?? 0} available`, tone: 'from-indigo-500 to-indigo-700' },
+    { label: 'Out of Stock', value: metrics?.out_of_stock_products ?? '—', sub: `${metrics?.total_inventory_units ?? 0} units total`, tone: 'from-amber-500 to-orange-600' },
+    { label: 'Total Revenue', value: metrics ? `ETB ${Number(metrics.total_sales).toLocaleString()}` : '—', sub: `${metrics?.paid_orders ?? 0} paid orders`, tone: 'from-emerald-500 to-teal-600' },
+    { label: 'Pending Orders', value: metrics?.pending_orders ?? '—', sub: `${metrics?.processing_orders ?? 0} processing`, tone: 'from-slate-600 to-slate-800' },
+  ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="border-b border-slate-200 pb-5 mb-8">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">System Administration Console</h1>
-        <p className="text-sm text-slate-500 mt-1">Authorized staff context engine for platform configurations.</p>
+    <div className="space-y-6">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-400">Overview</p>
+        <h2 className="mt-1 text-2xl font-black text-slate-100">Dashboard Metrics</h2>
+        <p className="mt-1 text-sm text-slate-400">Live aggregates pulled from the database.</p>
       </div>
-
-      {/* Action Notification Banners */}
-      {error && <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700 font-medium">&#9888; {error}</div>}
-      {successMsg && <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700 font-medium">✨ {successMsg}</div>}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* LEFT COLUMN: PRODUCT INVENTORY INPUT CREATION FORM CONTAINER */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-fit">
-          <h2 className="text-lg font-bold text-slate-900 mb-4">Provision New Product</h2>
-          <form onSubmit={handleCreateProduct} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Product Title</label>
-              <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-black placeholder:text-slate-500 focus:outline-indigo-600" required />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {loading
+          ? [1, 2, 3, 4].map(i => <MetricSkeleton key={i} />)
+          : cards.map(c => (
+            <div key={c.label} className={`rounded-2xl border border-white/10 bg-gradient-to-br ${c.tone} p-5 text-white shadow-lg`}>
+              <p className="text-xs font-semibold text-white/75">{c.label}</p>
+              <p className="mt-3 text-2xl font-black">{c.value}</p>
+              <p className="mt-1 text-xs text-white/60">{c.sub}</p>
             </div>
-            <div>
-           <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Brand Name</label>
-          <input type="text" name="brand" value={formData.brand} onChange={handleInputChange} className="w-full px-3 py-2  border border-slate-700 rounded-lg text-sm text-black placeholder:text-slate-500 focus:outline-none focus:border-indigo-500" required />
-           </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Description</label>
-              <textarea name="description" value={formData.description} onChange={handleInputChange} rows="3" className="w-full px-3 py-2  border border-slate-200 rounded-lg text-sm text-black placeholder:text-slate-500 focus:outline-indigo-600" required></textarea>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Price (ETB)</label>
-                <input type="number" name="price" value={formData.price} onChange={handleInputChange} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-indigo-600" required />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Stock Vol</label>
-                <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-indigo-600" required />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-            <div>
-             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Discount Price (ETB)</label>
-               <input type="number" name="discount_price" value={formData.discount_price} onChange={handleInputChange} className="w-full px-3 py-2 bg-[#161f32] border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500" placeholder="Optional" />
-                </div>
-                <div className="flex items-center mt-6">
-                <input type="checkbox" name="is_available" checked={formData.is_available} onChange={(e) => setFormData(prev => ({ ...prev, is_available: e.target.checked }))} className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-700 rounded bg-[#161f32]" />
-                 <label className="ml-2 block text-sm font-medium text-slate-300">Is Available for Sale</label>
-                 </div>
-                </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Category Code ID</label>
-              <input type="number" name="category" value={formData.category} onChange={handleInputChange} placeholder="e.g. 1" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-indigo-600" required />
-            </div>
-            <div>
-       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Product Visual Image</label>
-     <input 
-      id="product-image-input"
-      type="file" 
-      accept="image/*"
-       onChange={(e) => setSelectedFile(e.target.files[0])} 
-       className="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-950 file:text-indigo-300 hover:file:bg-indigo-900 cursor-pointer"
-       />
-           </div>
-            <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-2.5 px-4 rounded-lg shadow-sm transition">
-              Commit Row to Live Storefront
-            </button>
-          </form>
-        </div>
-
-        {/* RIGHT COLUMN: ACTIVE MANAGEMENT INVENTORY GRID LEDGER */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-          <h2 className="text-lg font-bold text-slate-900 mb-4">Active Database Catalog</h2>
-          {loading ? (
-            <p className="text-sm text-slate-400 animate-pulse">Re-indexing database layout rows...</p>
-          ) : products.length === 0 ? (
-            <p className="text-sm text-slate-400">Database product catalog is currently blank.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-600">
-                <thead className="text-xs font-bold text-slate-400 bg-slate-50 uppercase tracking-wider border-b border-slate-100">
-                  <tr>
-                    <th className="py-3 px-4">Item ID</th>
-                    <th className="py-3 px-4">Title</th>
-                    <th className="py-3 px-4">Price</th>
-                    <th className="py-3 px-4">Stock</th>
-                    <th className="py-3 px-4 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                  {products.map((prod) => (
-                    <tr key={prod.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-3.5 px-4 font-mono text-xs text-slate-400">#{prod.id}</td>
-                      <td className="py-3.5 px-4 font-bold text-slate-900">{prod.name}</td>
-                      <td className="py-3.5 px-4">{parseFloat(prod.price).toLocaleString()} ETB</td>
-                      <td className="py-3.5 px-4">
-                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${prod.stock > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                          {prod.stock} units
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-center">
-                        <button onClick={() => handleDeleteProduct(prod.id)} className="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-2.5 py-1.5 rounded-lg transition">
-                          Scrub Row
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+          ))
+        }
+      </div>
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <p className="text-sm font-semibold text-slate-300 mb-1">Quick Actions</p>
+        <p className="text-xs text-slate-500">Use the sidebar to navigate to Products management or Admin User provisioning.</p>
       </div>
     </div>
   );
 };
 
-export default AdminDashboard;
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB 2 — Products (create form + inventory table)
+// ══════════════════════════════════════════════════════════════════════════════
+const ProductsTab = () => {
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [formData, setFormData] = useState(INITIAL_PRODUCT_FORM);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [formBusy, setFormBusy] = useState(false);
 
+  const loadProducts = useCallback(async () => {
+    setProductsLoading(true);
+    try { const { data } = await api.get('/products/'); setProducts(data.results ?? data ?? []); }
+    catch { toast.error('Failed to load product inventory.'); }
+    finally { setProductsLoading(false); }
+  }, []);
+
+  useEffect(() => {
+    loadProducts();
+    api.get('/products/categories/').then(({ data }) => setCategories(data.results ?? data ?? [])).catch(() => { });
+  }, [loadProducts]);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(p => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormBusy(true);
+    const fd = new FormData();
+    fd.append('name', formData.name);
+    fd.append('slug', formData.slug ? buildSlug(formData.slug) : buildSlug(formData.name));
+    fd.append('description', formData.description);
+    fd.append('price', formData.price);
+    fd.append('stock', formData.stock);
+    fd.append('category', formData.category);
+    fd.append('brand', formData.brand);
+    fd.append('is_available', String(formData.is_available));
+    if (formData.discount_price) fd.append('discount_price', formData.discount_price);
+    if (selectedFile) fd.append('image', selectedFile);
+    try {
+      const { data } = await api.post('/products/', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      toast.success(`"${data.name}" added to the catalog.`);
+      setFormData(INITIAL_PRODUCT_FORM); setSelectedFile(null);
+      const el = document.getElementById('product-image-input'); if (el) el.value = '';
+      loadProducts();
+    } catch (err) {
+      const msg = err.response?.data ? Object.values(err.response.data).flat().join(' ') : 'Failed to create the product.';
+      toast.error(msg);
+    } finally { setFormBusy(false); }
+  };
+
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    try { await api.delete(`/products/${id}/`); toast.success(`"${name}" removed.`); loadProducts(); }
+    catch { toast.error('Delete failed — check permissions.'); }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-400">Catalog</p>
+        <h2 className="mt-1 text-2xl font-black text-slate-100">Products Management</h2>
+        <p className="mt-1 text-sm text-slate-400">Create new products and manage existing inventory.</p>
+      </div>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1.1fr]">
+        {/* ── Create form ── */}
+        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+          <h3 className="text-base font-bold text-slate-100 mb-1">Record New Product</h3>
+          <p className="text-xs text-slate-400 mb-5">Posts to <code className="text-indigo-400">POST /api/products/</code> with image.</p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div><label className={labelCls}>Product Name *</label><input type="text" name="name" value={formData.name} onChange={handleChange} className={inputCls} required /></div>
+              <div><label className={labelCls}>Slug <span className="normal-case font-normal text-slate-500">(auto if blank)</span></label><input type="text" name="slug" value={formData.slug} onChange={handleChange} placeholder={formData.name ? buildSlug(formData.name) : 'auto-generated'} className={inputCls} /></div>
+            </div>
+            <div><label className={labelCls}>Description *</label><textarea name="description" value={formData.description} onChange={handleChange} rows={3} className={inputCls + ' resize-none'} required /></div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div><label className={labelCls}>Price (ETB) *</label><input type="number" min="0.01" step="0.01" name="price" value={formData.price} onChange={handleChange} className={inputCls} required /></div>
+              <div><label className={labelCls}>Discount Price</label><input type="number" min="0" step="0.01" name="discount_price" value={formData.discount_price} onChange={handleChange} placeholder="Optional" className={inputCls} /></div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div><label className={labelCls}>Stock *</label><input type="number" min="0" name="stock" value={formData.stock} onChange={handleChange} className={inputCls} required /></div>
+              <div><label className={labelCls}>Brand *</label><input type="text" name="brand" value={formData.brand} onChange={handleChange} className={inputCls} required /></div>
+            </div>
+            <div>
+              <label className={labelCls}>Category *</label>
+              {categories.length > 0
+                ? <select name="category" value={formData.category} onChange={handleChange} className={inputCls + ' bg-slate-950'} required><option value="">— Select a category —</option>{categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
+                : <input type="number" name="category" value={formData.category} onChange={handleChange} placeholder="Category ID" className={inputCls} required />}
+            </div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                <input type="checkbox" name="is_available" checked={formData.is_available} onChange={handleChange} className="h-4 w-4 rounded border-slate-600 bg-slate-950 accent-indigo-500" />
+                Available for sale
+              </label>
+              <div className="flex-1 sm:max-w-xs">
+                <label className={labelCls}>Product Image</label>
+                <input id="product-image-input" type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files?.[0] ?? null)} className="block w-full text-xs text-slate-400 file:mr-3 file:rounded-full file:border-0 file:bg-indigo-600/20 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-indigo-300 hover:file:bg-indigo-600/30 cursor-pointer" />
+              </div>
+            </div>
+            <button type="submit" disabled={formBusy} className="w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60">
+              {formBusy ? 'Uploading…' : 'Create Product'}
+            </button>
+          </form>
+        </section>
+        {/* ── Inventory table ── */}
+        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <div><h3 className="text-base font-bold text-slate-100">Live Inventory</h3><p className="text-xs text-slate-400 mt-0.5">All products in the database.</p></div>
+            <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${productsLoading ? 'bg-amber-500/10 text-amber-400' : 'bg-emerald-500/10 text-emerald-400'}`}>{productsLoading ? 'Syncing…' : `${products.length} items`}</span>
+          </div>
+          {productsLoading ? <div className="space-y-2">{[1, 2, 3, 4].map(i => <RowSkeleton key={i} />)}</div>
+            : products.length === 0 ? <div className="py-16 text-center text-sm text-slate-500">No products yet — use the form to add the first one.</div>
+              : <div className="overflow-x-auto"><table className="min-w-full divide-y divide-slate-800 text-left text-sm">
+                <thead><tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                  <th className="py-2.5 pr-4 pl-1">Name</th><th className="py-2.5 pr-4">Price</th><th className="py-2.5 pr-4">Stock</th><th className="py-2.5 pr-4">Status</th><th className="py-2.5 pl-1 text-right">Action</th>
+                </tr></thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {products.map(p => (
+                    <tr key={p.id} className="hover:bg-slate-800/30 transition-colors">
+                      <td className="py-3 pr-4 pl-1 font-semibold text-slate-100 max-w-[160px] truncate">{p.name}</td>
+                      <td className="py-3 pr-4 text-slate-300">{Number(p.price).toLocaleString()} ETB</td>
+                      <td className="py-3 pr-4"><span className={`text-xs font-bold px-2 py-0.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>{p.stock}</span></td>
+                      <td className="py-3 pr-4"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${p.is_available ? 'bg-indigo-500/10 text-indigo-400' : 'bg-slate-700 text-slate-500'}`}>{p.is_available ? 'Live' : 'Hidden'}</span></td>
+                      <td className="py-3 pl-1 text-right"><button onClick={() => handleDelete(p.id, p.name)} className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-2.5 py-1.5 text-xs font-semibold text-rose-400 transition hover:bg-rose-500/20">Delete</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table></div>}
+        </section>
+      </div>
+    </div>
+  );
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB 3 — Admin Users (superuser-only provisioning form)
+// ══════════════════════════════════════════════════════════════════════════════
+const AdminUsersTab = () => {
+  const { user } = useAuth();
+  const [form, setForm] = useState(INITIAL_ADMIN_FORM);
+  const [busy, setBusy] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm(p => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      const { data } = await api.post('/custom-admin/users/', form);
+      toast.success(`Admin account created for ${data.email}.`);
+      setForm(INITIAL_ADMIN_FORM);
+    } catch (err) {
+      toast.error(err.response?.data?.error || err.response?.data?.detail || 'Failed to create admin account.');
+    } finally { setBusy(false); }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-400">Access Control</p>
+        <h2 className="mt-1 text-2xl font-black text-slate-100">Admin User Provisioning</h2>
+        <p className="mt-1 text-sm text-slate-400">Grant staff or superuser privileges to management accounts.</p>
+      </div>
+
+      {!user?.is_superuser ? (
+        <div className="rounded-2xl border border-amber-800/40 bg-amber-900/20 p-6 text-sm text-amber-300">
+          <p className="font-bold mb-1">⚠ Superuser Access Required</p>
+          <p className="text-amber-400/80">Only superusers can provision new admin accounts. Your account has staff access but not superuser privileges.</p>
+        </div>
+      ) : (
+        <div className="max-w-lg">
+          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+            <h3 className="text-base font-bold text-slate-100 mb-1">Create Admin Account</h3>
+            <p className="text-xs text-slate-400 mb-5">New accounts are created via <code className="text-indigo-400">POST /api/custom-admin/users/</code></p>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div><label className={labelCls}>Email *</label><input type="email" name="email" value={form.email} onChange={handleChange} className={inputCls} required /></div>
+                <div><label className={labelCls}>Password *</label><input type="password" name="password" value={form.password} onChange={handleChange} className={inputCls} required /></div>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div><label className={labelCls}>First Name</label><input type="text" name="first_name" value={form.first_name} onChange={handleChange} className={inputCls} /></div>
+                <div><label className={labelCls}>Last Name</label><input type="text" name="last_name" value={form.last_name} onChange={handleChange} className={inputCls} /></div>
+              </div>
+              <div className="flex flex-wrap gap-5 pt-1">
+                <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                  <input type="checkbox" name="is_staff" checked={form.is_staff} onChange={handleChange} className="h-4 w-4 rounded border-slate-600 bg-slate-950 accent-indigo-500" />
+                  Staff access
+                </label>
+                <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                  <input type="checkbox" name="is_superuser" checked={form.is_superuser} onChange={handleChange} className="h-4 w-4 rounded border-slate-600 bg-slate-950 accent-indigo-500" />
+                  Superuser access
+                </label>
+              </div>
+              <button type="submit" disabled={busy} className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
+                {busy ? 'Creating…' : 'Create Admin User'}
+              </button>
+            </form>
+          </section>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ROOT — reads activeTab from AdminLayout context and renders exactly one tab
+// ══════════════════════════════════════════════════════════════════════════════
+const AdminDashboard = () => {
+  const { activeTab } = useAdminTab();
+
+  return (
+    <div className="min-h-full">
+      {activeTab === 'overview' && <OverviewTab />}
+      {activeTab === 'products' && <ProductsTab />}
+      {activeTab === 'admin-users' && <AdminUsersTab />}
+    </div>
+  );
+};
+
+export default AdminDashboard;

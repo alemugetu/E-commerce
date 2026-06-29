@@ -2,11 +2,83 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from decimal import Decimal
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.contrib.auth import get_user_model
+from django.db.models import Sum, Count, Q
 from products.serializers import ProductImageSerializer
 from products.models import Product
-from products.serializers import ProductSerializer  # Adjust based on your product app path
+from products.serializers import ProductSerializer
+from orders.models import Order
+
+User = get_user_model()
+
+
+class AdminMetricsView(APIView):
+    """Provide aggregated dashboard metrics for the admin console."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not (request.user.is_staff or request.user.is_superuser):
+            return Response({"error": "Access Denied."}, status=status.HTTP_403_FORBIDDEN)
+
+        total_products = Product.objects.count()
+        available_products = Product.objects.filter(is_available=True).count()
+        out_of_stock_products = Product.objects.filter(stock__lte=0).count()
+        total_inventory_units = Product.objects.aggregate(total=Sum('stock'))['total'] or 0
+        paid_orders = Order.objects.filter(status='Paid')
+        total_sales = paid_orders.aggregate(total_sales=Sum('total_amount'))['total_sales'] or 0
+        pending_orders = Order.objects.filter(status='Pending').count()
+        processing_orders = Order.objects.filter(status='Processing').count()
+
+        return Response({
+            'total_products': total_products,
+            'available_products': available_products,
+            'out_of_stock_products': out_of_stock_products,
+            'total_inventory_units': total_inventory_units,
+            'total_sales': float(total_sales),
+            'paid_orders': paid_orders.count(),
+            'pending_orders': pending_orders,
+            'processing_orders': processing_orders,
+        }, status=status.HTTP_200_OK)
+
+
+class CreateAdminUserView(APIView):
+    """Allow superusers to create new staff or superuser accounts."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({"error": "Only superusers can create admin accounts."}, status=status.HTTP_403_FORBIDDEN)
+
+        email = request.data.get('email', '').strip().lower()
+        password = request.data.get('password', '')
+        first_name = request.data.get('first_name', '')
+        last_name = request.data.get('last_name', '')
+        is_staff = request.data.get('is_staff', True)
+        is_superuser = request.data.get('is_superuser', False)
+
+        if not email or not password:
+            return Response({"error": "Email and password are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "An account with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.create_user(
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+        )
+        user.is_staff = bool(is_staff)
+        user.is_superuser = bool(is_superuser)
+        user.save()
+
+        return Response({
+            'id': user.id,
+            'email': user.email,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+        }, status=status.HTTP_201_CREATED)
 
 
 class VerifyAdminRoleView(APIView):

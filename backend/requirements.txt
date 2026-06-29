@@ -6,4 +6,5 @@ django-cors-headers
  pillow
  django-filter
  chapa
+ decouple
  

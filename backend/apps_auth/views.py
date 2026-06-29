@@ -137,7 +137,7 @@ class ForgotPasswordView(APIView):
         
         # Build the dynamic URL pointing back to your React client layout routing
         frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
-        reset_link = f"{frontend_url}/reset-password/{uid}/{token}/"
+        reset_link = f"{frontend_url}/reset-password/{uid}/{token}"
 
         # Fire email using standard Django backend email mechanisms
         try:
@@ -147,6 +147,7 @@ class ForgotPasswordView(APIView):
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
                 fail_silently=False,
+                html_message=f"<p>Click the link below to securely update your credentials:</p><p><a href='{reset_link}'>{reset_link}</a></p><p>This link will expire shortly.</p>"
             )
         except Exception:
             return Response({"error": "Email dispatcher failed. Check system SMTP profiles."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -169,7 +170,7 @@ class ConfirmPasswordResetView(APIView):
         if not all([uidb64, token, new_password]):
             return Response({"error": "Missing critical parameters required for reset execution."}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
+        try: 
             # Decode user primary key from base64
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = CustomUser.objects.get(pk=uid)

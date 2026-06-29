@@ -10,8 +10,10 @@ export const api = axios.create({
 // Helper to inject the short-lived access token into headers in-memory
 export const setLocalAccessToken = (token) => {
   if (token) {
+    localStorage.setItem('access_token', token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   } else {
+    localStorage.removeItem('access_token');
     delete api.defaults.headers.common['Authorization'];
   }
 };

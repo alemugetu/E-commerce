@@ -5,7 +5,7 @@ import api from '../services/api';
 const ResetPasswordConfirm = () => {
   const { uid, token } = useParams(); // Automatically extract parameters from layout URL paths
   const navigate = useNavigate();
-  
+
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,7 +25,7 @@ const ResetPasswordConfirm = () => {
     try {
       await api.post('/auth/reset-password-confirm/', {
         uid,
-        token,
+        token: token?.replace(/\/+$/, ''), // Remove trailing slash if React Router captured it
         new_password: newPassword
       });
       setSuccess(true);

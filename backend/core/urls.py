@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-from django.conf.urls.static import static
+from django.conf.urls.static import static 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,6 +14,8 @@ urlpatterns = [
     path('api/orders/', include('orders.urls')),
     #For payments
     path('api/payments/', include('payments.urls')),
+    #For admin dashboard control endpoints
+    path('api/custom-admin/', include('custom_admin.urls')),
 ]
 
 if settings.DEBUG:

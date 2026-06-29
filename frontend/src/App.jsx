@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 // 1. Import TanStack Query core providers
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
 
 // Auth State System Imports
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -21,6 +22,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import CustomerDashboard from './pages/CustomerDashboard';
+import DashboardOrders from './pages/DashboardOrders';
+import DashboardAddress from './pages/DashboardAddress';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import CheckoutSuccess from './pages/CheckoutSuccess';
@@ -80,7 +83,9 @@ const AppRouter = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<CustomerDashboard />} />
+        <Route index          element={<CustomerDashboard />} />
+        <Route path="orders"  element={<DashboardOrders />} />
+        <Route path="address" element={<DashboardAddress />} />
       </Route>
 
       {/* Admin Routes */}
@@ -107,6 +112,27 @@ function App() {
   return (
     // 3. Wrap entire application with the Query Client Provider framework
     <QueryClientProvider client={queryClient}>
+      {/* Global toast notification renderer — sits outside the Router so it's always available */}
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#1e293b',
+            color: '#f1f5f9',
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            borderRadius: '0.75rem',
+            border: '1px solid #334155',
+          },
+          success: {
+            iconTheme: { primary: '#10b981', secondary: '#fff' },
+          },
+          error: {
+            iconTheme: { primary: '#ef4444', secondary: '#fff' },
+          },
+        }}
+      />
       <AuthProvider>
         <CartProvider>
         <BrowserRouter>

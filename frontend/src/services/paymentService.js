@@ -23,12 +23,13 @@ export const initiateChapaCheckout = async (cartItems = null) => {
  */
 export const fetchOrderHistory = async (page = 1) => {
   try {
-    const response = await api.get(`/api/orders/history/?page=${page}`);
-    return response.data; // Expects layout structural keys: { count, next, previous, results }
+    // Correct endpoint: /api/orders/order-history/ (matches Django orders/urls.py)
+    const response = await api.get(`/orders/order-history/?page=${page}`);
+    return response.data; // { count, next, previous, results }
   } catch (error) {
     throw new Error(
-      error.response?.data?.error || 
-      "Could not retrieve your purchase history from the server."
+      error.response?.data?.error ||
+      'Could not retrieve your purchase history from the server.'
     );
   }
 };

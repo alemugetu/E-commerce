@@ -1,119 +1,204 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { api } from '../services/api';
+import toast from 'react-hot-toast';
 
+// ─── Skeleton ────────────────────────────────────────────────────────────────
+const FieldSkeleton = () => (
+  <div className="space-y-1.5 animate-pulse">
+    <div className="h-3 w-24 bg-slate-200 rounded" />
+    <div className="h-9 w-full bg-slate-100 rounded-lg" />
+  </div>
+);
+
+// ─── Component ───────────────────────────────────────────────────────────────
 const CustomerDashboard = () => {
   const [profile, setProfile] = useState({
-    first_name: '',
-    last_name: '',
+    first_name:   '',
+    last_name:    '',
     phone_number: '',
-    addresse: '',
-    email: ''
+    addresse:     '',
+    email:        '',
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [successMsg, setSuccessMsg] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading]       = useState(true);
+  const [fetchError, setFetchError] = useState(null);
+  const [saving, setSaving]         = useState(false);
 
-  // 1. Fetch user data records immediately on mount
+  // ── Fetch profile on mount ────────────────────────────────────────────
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      setFetchError(null);
       try {
-        const response = await api.get('/auth/profile/');
+        const { data } = await api.get('/auth/profile/');
         setProfile({
-          first_name: response.data.first_name || '',
-          last_name: response.data.last_name || '',
-          phone_number: response.data.phone_number || '',
-          addresse: response.data.addresse || '',
-          email: response.data.email || ''
+          first_name:   data.first_name   || '',
+          last_name:    data.last_name    || '',
+          phone_number: data.phone_number || '',
+          addresse:     data.addresse     || '',
+          email:        data.email        || '',
         });
-      } catch (err) {
-        setError("Failed to synchronize account metrics with backend nodes.");
+      } catch {
+        setFetchError('Failed to load profile data. Please refresh the page.');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchUserProfile();
+    fetchProfile();
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 2. Commit modifications back down to postgreSQL
-  const handleUpdateProfile = async (e) => {
+  // ── Save profile changes ─────────────────────────────────────────────
+  const handleSave = async (e) => {
     e.preventDefault();
-    setError(null);
-    setSuccessMsg("");
-    setIsSubmitting(true);
-
+    setSaving(true);
     try {
-      const response = await api.put('/auth/profile/', {
-        first_name: profile.first_name,
-        last_name: profile.last_name,
+      await api.put('/auth/profile/', {
+        first_name:   profile.first_name,
+        last_name:    profile.last_name,
         phone_number: profile.phone_number,
-        addresse: profile.addresse
+        addresse:     profile.addresse,
       });
-      
-      setSuccessMsg("Account profile details updated successfully!");
+      toast.success('Profile updated successfully!');
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to commit information revisions.");
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        'Failed to save changes. Please try again.';
+      toast.error(msg);
     } finally {
-      setIsSubmitting(false);
+      setSaving(false);
     }
   };
 
-  if (loading) {
+  // ── Fetch error state ────────────────────────────────────────────────
+  if (fetchError) {
     return (
-      <div className="max-w-4xl mx-auto p-12 text-center text-slate-400">
-        <div className="animate-spin inline-block w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full mb-2"></div>
-        <p className="text-xs">Fetching personal profile metadata...</p>
+      <div className="text-center py-16">
+        <p className="text-3xl mb-3">⚠️</p>
+        <h3 className="text-lg font-bold text-slate-900">Could Not Load Profile</h3>
+        <p className="text-sm text-slate-500 mt-1 mb-5">{fetchError}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition"
+        >
+          Retry
+        </button>
       </div>
     );
   }
 
+  // ── Main form ────────────────────────────────────────────────────────
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-black text-slate-900">Account Settings</h1>
-        <p className="text-xs text-slate-500 mt-1">Configure your shipping coordinates and primary identity vectors.</p>
+    <div>
+      {/* Section header */}
+      <div className="mb-6">
+        <h2 className="text-xl font-black text-slate-900">My Profile</h2>
+        <p className="text-xs text-slate-400 mt-0.5">
+          Update your personal information and account details.
+        </p>
       </div>
 
-      {error && <div className="mb-4 p-3 bg-rose-50 border border-rose-100 rounded-lg text-xs text-rose-600 font-medium">⚠️ {error}</div>}
-      {successMsg && <div className="mb-4 p-3 bg-emerald-50 border border-emerald-100 rounded-lg text-xs text-emerald-600 font-medium">✨ {successMsg}</div>}
-
-      <form onSubmit={handleUpdateProfile} className="bg-white p-6 border border-slate-100 rounded-xl shadow-sm space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">First Name</label>
-            <input type="text" name="first_name" value={profile.first_name} onChange={handleInputChange} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-indigo-500" />
+      {loading ? (
+        /* Skeleton grid */
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 gap-4">
+            <FieldSkeleton /><FieldSkeleton />
           </div>
-          <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Last Name</label>
-            <input type="text" name="last_name" value={profile.last_name} onChange={handleInputChange} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-indigo-500" />
+          <FieldSkeleton />
+          <FieldSkeleton />
+          <FieldSkeleton />
+          <div className="h-9 w-36 bg-slate-200 rounded-lg animate-pulse" />
+        </div>
+      ) : (
+        <form onSubmit={handleSave} className="space-y-5">
+
+          {/* Name row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                First Name
+              </label>
+              <input
+                type="text"
+                name="first_name"
+                value={profile.first_name}
+                onChange={handleChange}
+                placeholder="Abebe"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                Last Name
+              </label>
+              <input
+                type="text"
+                name="last_name"
+                value={profile.last_name}
+                onChange={handleChange}
+                placeholder="Kebede"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+              />
+            </div>
           </div>
-        </div>
 
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email Address (Primary Login)</label>
-          <input type="email" value={profile.email} disabled className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-400 cursor-not-allowed" />
-        </div>
+          {/* Email — read-only */}
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              Email Address <span className="normal-case font-normal">(cannot be changed)</span>
+            </label>
+            <input
+              type="email"
+              value={profile.email}
+              disabled
+              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-400 cursor-not-allowed"
+            />
+          </div>
 
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Phone Number</label>
-          <input type="text" name="phone_number" value={profile.phone_number} onChange={handleInputChange} placeholder="+251..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-indigo-500" />
-        </div>
+          {/* Phone */}
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              Phone Number
+            </label>
+            <input
+              type="text"
+              name="phone_number"
+              value={profile.phone_number}
+              onChange={handleChange}
+              placeholder="+251 911 000 000"
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+            />
+          </div>
 
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Physical Address / Shipping Destination</label>
-          <input type="text" name="addresse" value={profile.addresse} onChange={handleInputChange} placeholder="Addis Ababa, Sub City, Woreda..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-indigo-500" />
-        </div>
+          {/* Address preview (editable here too for convenience) */}
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              Delivery Address
+            </label>
+            <input
+              type="text"
+              name="addresse"
+              value={profile.addresse}
+              onChange={handleChange}
+              placeholder="Sub-city, Woreda, House No..."
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+            />
+          </div>
 
-        <button type="submit" disabled={isSubmitting} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2.5 px-4 rounded-lg transition shadow-sm">
-          {isSubmitting ? "Saving Revisions..." : "Save Profile Revisions"}
-        </button>
-      </form>
+          {/* Save */}
+          <button
+            type="submit"
+            disabled={saving}
+            className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-xs py-2.5 px-5 rounded-lg transition shadow-sm"
+          >
+            {saving ? 'Saving…' : 'Save Changes'}
+          </button>
+        </form>
+      )}
     </div>
   );
 };

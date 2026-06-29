@@ -1,7 +1,9 @@
 from rest_framework import viewsets, permissions, filters
+from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend # pyright: ignore[reportMissingModuleSource]
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
+from .models import Category, Product, ProductImage
+from .serializers import CategorySerializer, ProductSerializer, ProductImageSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -51,6 +53,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    parser_classes = [MultiPartParser, FormParser]
 
     filter_backends = [
         DjangoFilterBackend,
@@ -125,5 +128,22 @@ class ProductViewSet(viewsets.ModelViewSet):
         ).prefetch_related(
             'images'
         )
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        product = serializer.save()
+
+        image_file = request.FILES.get('image')
+        if image_file:
+            ProductImage.objects.create(
+                product=product,
+                image=image_file,
+                is_feature=True,
+                alt_text=request.data.get('alt_text', product.name),
+            )
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=201, headers=headers)
     
     

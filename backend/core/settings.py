@@ -13,6 +13,7 @@ from datetime import timedelta
 import os
 from pathlib import Path
 import environ # type: ignore
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -222,3 +223,24 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# --- EMAIL CONFIGURATION ---
+ 
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND",
+    default="django.core.mail.backends.smtp.EmailBackend",
+)
+
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_PORT = env.int("EMAIL_PORT")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+
+FRONTEND_URL = env(
+    "FRONTEND_URL",
+    default="http://localhost:5173"
+)
+  
