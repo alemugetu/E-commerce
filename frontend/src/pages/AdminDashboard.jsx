@@ -112,13 +112,33 @@ const ProductsTab = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormBusy(true);
+
+    let categoryId = formData.category;
+    const existingCategory = categories.find(
+      c => c.name.toLowerCase() === String(formData.category).toLowerCase() || c.id.toString() === String(formData.category)
+    );
+    
+    if (existingCategory) {
+      categoryId = existingCategory.id;
+    } else if (formData.category) {
+      try {
+        const { data: newCat } = await api.post('/products/categories/', { name: formData.category });
+        categoryId = newCat.id;
+        setCategories(prev => [...prev, newCat]);
+      } catch (err) {
+        toast.error('Failed to create new category.');
+        setFormBusy(false);
+        return;
+      }
+    }
+
     const fd = new FormData();
     fd.append('name', formData.name);
     fd.append('slug', formData.slug ? buildSlug(formData.slug) : buildSlug(formData.name));
     fd.append('description', formData.description);
     fd.append('price', formData.price);
     fd.append('stock', formData.stock);
-    fd.append('category', formData.category);
+    fd.append('category', categoryId);
     fd.append('brand', formData.brand);
     fd.append('is_available', String(formData.is_available));
     if (formData.discount_price) fd.append('discount_price', formData.discount_price);
@@ -152,7 +172,6 @@ const ProductsTab = () => {
         {/* ── Create form ── */}
         <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
           <h3 className="text-base font-bold text-slate-100 mb-1">Record New Product</h3>
-          <p className="text-xs text-slate-400 mb-5">Posts to <code className="text-indigo-400">POST /api/products/</code> with image.</p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div><label className={labelCls}>Product Name *</label><input type="text" name="name" value={formData.name} onChange={handleChange} className={inputCls} required /></div>
@@ -169,9 +188,19 @@ const ProductsTab = () => {
             </div>
             <div>
               <label className={labelCls}>Category *</label>
-              {categories.length > 0
-                ? <select name="category" value={formData.category} onChange={handleChange} className={inputCls + ' bg-slate-950'} required><option value="">— Select a category —</option>{categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
-                : <input type="number" name="category" value={formData.category} onChange={handleChange} placeholder="Category ID" className={inputCls} required />}
+              <input 
+                type="text" 
+                name="category" 
+                value={formData.category} 
+                onChange={handleChange} 
+                list="category-options"
+                className={inputCls} 
+                placeholder="Select or type new category"
+                required 
+              />
+              <datalist id="category-options">
+                {categories.map(c => <option key={c.id} value={c.name} />)}
+              </datalist>
             </div>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
@@ -251,10 +280,10 @@ const AdminUsersTab = () => {
         <p className="mt-1 text-sm text-slate-400">Grant staff or superuser privileges to management accounts.</p>
       </div>
 
-      {!user?.is_superuser ? (
+      {!user?.is_staff ? (
         <div className="rounded-2xl border border-amber-800/40 bg-amber-900/20 p-6 text-sm text-amber-300">
-          <p className="font-bold mb-1">⚠ Superuser Access Required</p>
-          <p className="text-amber-400/80">Only superusers can provision new admin accounts. Your account has staff access but not superuser privileges.</p>
+          <p className="font-bold mb-1">⚠ Staff Access Required</p>
+          <p className="text-amber-400/80">You need staff access to provision new admin accounts.</p>
         </div>
       ) : (
         <div className="max-w-lg">

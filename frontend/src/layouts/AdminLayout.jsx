@@ -1,29 +1,48 @@
 import React, { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getInitials } from '../utils/getInitials';
 import { AdminTabContext } from '../context/AdminTabContext';
 
 // Re-export so AdminDashboard can import from the layout path if preferred
 export { AdminTabContext, useAdminTab } from '../context/AdminTabContext';
 
 const NAV_ITEMS = [
-  { tab: 'overview',    label: 'Dashboard Overview', icon: '▣' },
-  { tab: 'products',    label: 'Products',            icon: '⬡' },
-  { tab: 'admin-users', label: 'Admin Users',         icon: '⊕' },
+  { tab: 'overview', label: 'Dashboard Overview', icon: '▣' },
+  { tab: 'products', label: 'Products', icon: '⬡' },
+  { tab: 'admin-users', label: 'Admin Users', icon: '⊕' },
 ];
 
 const AdminLayout = () => {
-  const { user, logout }            = useAuth();
+  const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeTab, setActiveTab]   = useState('overview');
+  const [activeTab, setActiveTab] = useState('overview');
 
-  // Avatar: show initials when user is loaded, pulse ring when still loading
-  const initials    = getInitials(user);
-  const displayName = user?.first_name
-    ? `${user.first_name} ${user.last_name}`.trim()
-    : user?.email ?? '';
-  const emailLine   = user?.email ?? '';
+  // Derive display values — fall back gracefully when names are empty
+  const displayName = user
+    ? (user.first_name ? `${user.first_name} ${user.last_name}`.trim() : user.email)
+    : '';
+  const emailLine = user?.email ?? '';
+
+  // Avatar initials: prefer name initials, fall back to email initial, never '?'
+  const initials = (() => {
+    if (!user) return '';
+    const first = user.first_name?.trim();
+    const last  = user.last_name?.trim();
+    if (first && last) return `${first[0]}${last[0]}`.toUpperCase();
+    if (first)         return first[0].toUpperCase();
+    if (user.email)    return user.email[0].toUpperCase();
+    return '?';
+  })();
+
+  // Deterministic avatar color from initials so it feels personalized
+  const avatarColors = [
+    'bg-indigo-600',   'bg-violet-600', 'bg-emerald-600',
+    'bg-amber-600',    'bg-rose-600',   'bg-sky-600',
+    'bg-teal-600',     'bg-orange-600',
+  ];
+  const avatarBg = initials
+    ? avatarColors[initials.charCodeAt(0) % avatarColors.length]
+    : 'bg-slate-700';
 
   const closeMobile = () => setMobileOpen(false);
 
@@ -48,13 +67,17 @@ const AdminLayout = () => {
 
             {/* Identity card */}
             <div className="flex items-center gap-3 border-b border-slate-800 px-5 py-4">
-              {/* Avatar — always renders; shows '?' while user is null */}
+              {/* Avatar — colored initial badge */}
               <div className={`
                 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full
                 text-sm font-bold text-white select-none ring-2
-                ${user ? 'bg-indigo-600 ring-indigo-500/30' : 'bg-slate-700 ring-slate-600/30 animate-pulse'}
+                ${user ? `${avatarBg} ring-white/20` : 'bg-slate-700 ring-slate-600/30 animate-pulse'}
               `}>
-                {initials}
+                {user ? initials : (
+                  <svg className="h-4 w-4 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  </svg>
+                )}
               </div>
               <div className="min-w-0">
                 {user ? (
@@ -77,7 +100,7 @@ const AdminLayout = () => {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <nav className="flex-1 px-3 py-4 space-y-1">
               <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.25em] text-slate-600">Navigation</p>
               {NAV_ITEMS.map((item) => {
                 const active = activeTab === item.tab;
@@ -108,14 +131,8 @@ const AdminLayout = () => {
                 onClick={closeMobile}
                 className="flex w-full items-center justify-center rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-700"
               >
-                ← Exit to Store
+                &#8592; Exit to Store
               </Link>
-              <button
-                onClick={logout}
-                className="flex w-full items-center justify-center rounded-xl border border-red-900/40 bg-red-950/30 px-4 py-2 text-xs font-semibold text-red-400 transition hover:bg-red-900/50 hover:text-red-300"
-              >
-                Sign Out
-              </button>
             </div>
           </aside>
 
