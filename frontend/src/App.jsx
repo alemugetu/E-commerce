@@ -16,6 +16,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import AdminProtectedRoute from './components/common/AdminProtectedRoute';
 
 
+
 // Page Component Imports
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -88,18 +89,11 @@ const AppRouter = () => {
         <Route path="address" element={<DashboardAddress />} />
       </Route>
 
-      {/* Admin Routes */}
-      <Route 
-        path="/admin" 
-        element={
-          <ProtectedRoute>
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<AdminDashboard />} />
-        
-        
+      {/* Admin Routes — staff/superuser only */}
+      <Route path="/admin" element={<AdminProtectedRoute />}>
+        <Route element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+        </Route>
       </Route>
 
       {/* Catch-All Fallback */}

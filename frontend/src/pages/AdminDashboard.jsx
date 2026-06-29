@@ -117,7 +117,7 @@ const ProductsTab = () => {
     const existingCategory = categories.find(
       c => c.name.toLowerCase() === String(formData.category).toLowerCase() || c.id.toString() === String(formData.category)
     );
-    
+
     if (existingCategory) {
       categoryId = existingCategory.id;
     } else if (formData.category) {
@@ -188,15 +188,15 @@ const ProductsTab = () => {
             </div>
             <div>
               <label className={labelCls}>Category *</label>
-              <input 
-                type="text" 
-                name="category" 
-                value={formData.category} 
-                onChange={handleChange} 
+              <input
+                type="text"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
                 list="category-options"
-                className={inputCls} 
+                className={inputCls}
                 placeholder="Select or type new category"
-                required 
+                required
               />
               <datalist id="category-options">
                 {categories.map(c => <option key={c.id} value={c.name} />)}
@@ -282,7 +282,7 @@ const AdminUsersTab = () => {
 
       {!user?.is_staff ? (
         <div className="rounded-2xl border border-amber-800/40 bg-amber-900/20 p-6 text-sm text-amber-300">
-          <p className="font-bold mb-1">⚠ Staff Access Required</p>
+          <p className="font-bold mb-1">&#x26A0; Staff Access Required</p>
           <p className="text-amber-400/80">You need staff access to provision new admin accounts.</p>
         </div>
       ) : (

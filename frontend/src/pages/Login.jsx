@@ -13,13 +13,30 @@ const Login = () => {
   const [localError, setLocalError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check if the user was bounced here by the ProtectedRoute guard. 
-  // If they were, we remember where they wanted to go. Otherwise, default to dashboard.
-  const from = location.state?.from?.pathname || '/dashboard';
+  // Where the user was trying to go before being bounced to /login.
+  // Used only as a fallback for non-role-specific redirects.
+  const from = location.state?.from?.pathname;
+
+  /**
+   * Determines the correct post-login destination based on role.
+   *  - Admin (is_staff or is_superuser) → /admin
+   *  - Everyone else                    → /dashboard (or their intended page)
+   */
+  const getRedirectPath = (loggedInUser) => {
+    if (loggedInUser?.is_staff || loggedInUser?.is_superuser) {
+      return '/admin';
+    }
+    // If the user was bounced from a customer-only page, send them back there.
+    // But never send a regular user to /admin even if that was the "from" path.
+    if (from && !from.startsWith('/admin')) {
+      return from;
+    }
+    return '/dashboard';
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,14 +50,20 @@ const Login = () => {
       return;
     }
 
-    // Call the global context login method we built in Phase 4
+    // Call the global context login method — returns { success, user?, error? }
     const result = await login(email, password);
 
     if (result.success) {
-      // If Django approves the credentials, send them to their intended destination securely
-      navigate(from, { replace: true });
+      // After login, the AuthContext updates the `user` state asynchronously.
+      // We read the fresh user from the result if provided, otherwise fall back
+      // to decoding the token ourselves via the context.
+      // The login() function in AuthContext calls enrichUserFromProfile which
+      // sets user state — but since setState is async, we decode from result.
+      // We pass the decoded user stored in context after await completes.
+      // Small trick: read the updated context user via a brief state settle.
+      // Use result.user if your login() returns it, otherwise read from context.
+      navigate(getRedirectPath(result.user ?? user), { replace: true });
     } else {
-      // If Django rejects them, display the exact error message on the form
       setLocalError(result.error);
       setIsSubmitting(false);
     }

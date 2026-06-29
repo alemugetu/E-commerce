@@ -123,7 +123,9 @@ export const AuthProvider = ({ children }) => {
       const decoded = decodeTokenToUser(access);
       await enrichUserFromProfile(decoded);
 
-      return { success: true };
+      // Return decoded user alongside success so callers (e.g. Login page) can
+      // make role-based redirect decisions without waiting for a re-render.
+      return { success: true, user: decoded };
     } catch (error) {
       return {
         success: false,

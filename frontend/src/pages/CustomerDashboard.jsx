@@ -43,7 +43,7 @@ const CustomerDashboard = () => {
         setLoading(false);
       }
     };
-    fetchProfile();
+    fetchProfile(); 
   }, []);
 
   const handleChange = (e) => {

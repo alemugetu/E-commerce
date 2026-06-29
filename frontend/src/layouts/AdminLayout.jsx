@@ -18,27 +18,36 @@ const AdminLayout = () => {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Derive display values — fall back gracefully when names are empty
-  const displayName = user
-    ? (user.first_name ? `${user.first_name} ${user.last_name}`.trim() : user.email)
-    : '';
-  const emailLine = user?.email ?? '';
+  const displayName = (() => {
+    if (!user) return "";
 
-  // Avatar initials: prefer name initials, fall back to email initial, never '?'
+    const first = user.first_name?.trim() ?? "";
+    const last = user.last_name?.trim() ?? "";
+
+    return `${first} ${last}`.trim() || user.email;
+  })();
+
+  const emailLine = user?.email ?? "";
+
   const initials = (() => {
-    if (!user) return '';
+    if (!user) return "";
+
     const first = user.first_name?.trim();
-    const last  = user.last_name?.trim();
+    const last = user.last_name?.trim();
+
     if (first && last) return `${first[0]}${last[0]}`.toUpperCase();
-    if (first)         return first[0].toUpperCase();
-    if (user.email)    return user.email[0].toUpperCase();
-    return '?';
+    if (first) return first[0].toUpperCase();
+    if (last) return last[0].toUpperCase();
+    if (user.email) return user.email[0].toUpperCase();
+
+    return "";
   })();
 
   // Deterministic avatar color from initials so it feels personalized
   const avatarColors = [
-    'bg-indigo-600',   'bg-violet-600', 'bg-emerald-600',
-    'bg-amber-600',    'bg-rose-600',   'bg-sky-600',
-    'bg-teal-600',     'bg-orange-600',
+    'bg-indigo-600', 'bg-violet-600', 'bg-emerald-600',
+    'bg-amber-600', 'bg-rose-600', 'bg-sky-600',
+    'bg-teal-600', 'bg-orange-600',
   ];
   const avatarBg = initials
     ? avatarColors[initials.charCodeAt(0) % avatarColors.length]

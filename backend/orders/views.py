@@ -284,8 +284,8 @@ class UserOrderHistoryView(APIView):
             Order.objects.filter(user=user)
             .order_by('-created_at')
             .prefetch_related(
-                'items__product__category_detail', # Prefetches category details for the serializer string lookup
-                'items__product__images'           # Prefetches related product images if needed on the frontend
+                'items__product__category', # Prefetches category for the serializer string lookup
+                'items__product__images'    # Prefetches related product images if needed on the frontend
             )
         )
         

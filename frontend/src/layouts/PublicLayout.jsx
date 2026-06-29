@@ -5,10 +5,10 @@ import Navbar from '../components/Navbar'; // Up one directory to src/, then int
 const PublicLayout = () => {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-950 font-body">
-      
+
       {/* Global Announcement Bar */}
       <div className="bg-indigo-600 text-white text-xs font-medium py-2 px-4 text-center">
-        Free shipping on all orders over 1,000 Birr!
+        Free shipping on all orders over 5,000 Birr!
       </div>
 
       {/* Production Navigation Bar Component */}
