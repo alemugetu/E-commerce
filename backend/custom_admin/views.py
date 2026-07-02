@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import get_user_model
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Q
 from products.serializers import ProductImageSerializer
 from products.models import Product
 from products.serializers import ProductSerializer
@@ -69,7 +69,7 @@ class CreateAdminUserView(APIView):
             first_name=first_name,
             last_name=last_name,
         )
-        user.is_staff = bool(is_staff)
+        user.is_staff = bool(is_staff) or bool(is_superuser)
         user.is_superuser = bool(is_superuser)
         user.save()
 
@@ -81,6 +81,78 @@ class CreateAdminUserView(APIView):
         }, status=status.HTTP_201_CREATED)
 
 
+class AdminUserManagementView(APIView):
+    """Allow superusers to list, block, and remove admin accounts."""
+    permission_classes = [IsAuthenticated]
+
+    def _serialize_admin_user(self, user):
+        return {
+            'id': user.id,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+            'is_active': user.is_active,
+            'created_at': user.created_at.isoformat() if hasattr(user, 'created_at') else None,
+        }
+
+    def get(self, request):
+        if not request.user.is_superuser:
+            return Response({"error": "Only superusers can manage admin accounts."}, status=status.HTTP_403_FORBIDDEN)
+
+        admin_users = User.objects.filter(Q(is_staff=True) | Q(is_superuser=True)).order_by('-is_superuser', '-is_staff', 'email')
+        return Response({
+            'results': [self._serialize_admin_user(user) for user in admin_users],
+            'summary': {
+                'total_admins': admin_users.count(),
+                'staff_users': admin_users.filter(is_staff=True, is_superuser=False).count(),
+                'superusers': admin_users.filter(is_superuser=True).count(),
+                'active_admins': admin_users.filter(is_active=True).count(),
+                'inactive_admins': admin_users.filter(is_active=False).count(),
+            },
+        }, status=status.HTTP_200_OK)
+
+    def patch(self, request, pk):
+        if not request.user.is_superuser:
+            return Response({"error": "Only superusers can manage admin accounts."}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            admin_user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({"error": "Target admin account not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if admin_user.pk == request.user.pk:
+            return Response({"error": "You cannot modify your own admin account."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'is_active' in request.data:
+            admin_user.is_active = bool(request.data.get('is_active'))
+        if 'is_staff' in request.data:
+            admin_user.is_staff = bool(request.data.get('is_staff'))
+        if 'is_superuser' in request.data:
+            admin_user.is_superuser = bool(request.data.get('is_superuser'))
+            if admin_user.is_superuser:
+                admin_user.is_staff = True
+
+        admin_user.save()
+        return Response(self._serialize_admin_user(admin_user), status=status.HTTP_200_OK)
+
+    def delete(self, request, pk):
+        if not request.user.is_superuser:
+            return Response({"error": "Only superusers can manage admin accounts."}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            admin_user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({"error": "Target admin account not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if admin_user.pk == request.user.pk:
+            return Response({"error": "You cannot delete your own admin account."}, status=status.HTTP_400_BAD_REQUEST)
+
+        admin_user.delete()
+        return Response({"message": f"Admin account {admin_user.email} removed."}, status=status.HTTP_200_OK)
+
+
 class VerifyAdminRoleView(APIView):
     """
     Endpoint used by the React AdminProtectedRoute to verify if the 
@@ -90,14 +162,13 @@ class VerifyAdminRoleView(APIView):
 
     def get(self, request):
         user = request.user
-        
-        # Enforce strict validation against your CustomUser properties
+
         if not (user.is_staff or user.is_superuser):
             return Response(
-                {"error": "Access Denied. Account holds insufficient administrative scope."}, 
+                {"error": "Access Denied. Account holds insufficient administrative scope."},
                 status=status.HTTP_403_FORBIDDEN
             )
-            
+
         return Response({
             "email": user.email,
             "is_staff": user.is_staff,
@@ -114,7 +185,6 @@ class AdminProductManagementView(APIView):
 
     def check_permissions(self, request):
         super().check_permissions(request)
-        # Extra explicit safety guard directly inside the view execution cycle
         if not (request.user.is_staff or request.user.is_superuser):
             self.permission_denied(
                 request, message="Access Denied: Administrative privileges required."
@@ -150,15 +220,15 @@ class AdminProductManagementView(APIView):
 
         product.delete()
         return Response({"message": "Product successfully deleted from system records."}, status=status.HTTP_200_OK)
-    
+
 
 class AdminProductImageUploadView(APIView):
     """
-    Dedicated endpoint allowing administrative users to attach binary image assets 
+    Dedicated endpoint allowing administrative users to attach binary image assets
     to a pre-existing Product instance using standard multipart form payloads.
     """
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser] # Required to process binary file transmissions cleanly
+    parser_classes = [MultiPartParser, FormParser]
 
     def check_permissions(self, request):
         super().check_permissions(request)
@@ -166,10 +236,9 @@ class AdminProductImageUploadView(APIView):
             self.permission_denied(request, message="Administrative privileges required.")
 
     def post(self, request):
-        # We pass request.data directly to your product image serializer
         serializer = ProductImageSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

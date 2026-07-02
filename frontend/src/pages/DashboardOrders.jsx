@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { fetchOrderHistory } from '../services/paymentService';
+import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 // ─── Skeleton row ────────────────────────────────────────────────────────────
 const OrderSkeleton = () => (
@@ -47,11 +49,13 @@ const FALLBACK_IMG =
 
 // ─── Component ───────────────────────────────────────────────────────────────
 const DashboardOrders = () => {
-  const [orders, setOrders]         = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState(null);
-  const [page, setPage]             = useState(1);
-  const [meta, setMeta]             = useState({ hasNext: false, hasPrev: false, total: 0 });
+  const { user } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState({ hasNext: false, hasPrev: false, total: 0 });
+  const [updatingId, setUpdatingId] = useState(null);
 
   const load = useCallback(async (targetPage) => {
     setLoading(true);
@@ -72,6 +76,18 @@ const DashboardOrders = () => {
   }, []);
 
   useEffect(() => { load(page); }, [page, load]);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    setUpdatingId(orderId);
+    try {
+      await api.patch(`/orders/orders/${orderId}/status/`, { status: newStatus });
+      await load(page);
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to update order status.');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
@@ -156,11 +172,27 @@ const DashboardOrders = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span
-                  className={`text-xs font-bold px-2.5 py-1 rounded-full border ${statusStyle(order.status)}`}
-                >
-                  {order.status}
-                </span>
+                {user?.is_staff || user?.is_superuser ? (
+                  <select
+                    value={order.status}
+                    disabled={updatingId === order.id}
+                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                    className="rounded-full border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-sm outline-none"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                ) : (
+                  <span
+                    className={`text-xs font-bold px-2.5 py-1 rounded-full border ${statusStyle(order.status)}`}
+                  >
+                    {order.status}
+                  </span>
+                )}
                 {/* is_paid badge */}
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${

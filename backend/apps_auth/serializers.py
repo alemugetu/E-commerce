@@ -12,8 +12,24 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['is_staff'] = user.is_staff
         token['is_superuser'] = user.is_superuser
         token['email'] = user.email
+        token['approval_status'] = user.approval_status
         
         return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        user = self.user
+
+        if not user.is_active:
+            raise serializers.ValidationError({'error': 'Your account has been disabled. Please contact support.'})
+
+        if user.approval_status == 'pending':
+            raise serializers.ValidationError({'error': 'Your account is still pending approval. Please wait for admin confirmation.'})
+
+        if user.approval_status == 'rejected':
+            raise serializers.ValidationError({'error': 'Your account has been rejected. Please contact support.'})
+
+        return data
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

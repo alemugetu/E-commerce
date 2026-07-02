@@ -278,29 +278,50 @@ class UserOrderHistoryView(APIView):
 
     def get(self, request):
         user = request.user
-        
-        # 1. Chronological sorting + Deep optimization to eliminate N+1 queries across related tables
+
         orders = (
             Order.objects.filter(user=user)
             .order_by('-created_at')
             .prefetch_related(
-                'items__product__category', # Prefetches category for the serializer string lookup
-                'items__product__images'    # Prefetches related product images if needed on the frontend
+                'items__product__category',
+                'items__product__images'
             )
         )
-        
-        # 2. Instantiate and apply the pagination framework manually inside the APIView
+
         paginator = OrderHistoryPagination()
         paginated_queryset = paginator.paginate_queryset(orders, request, view=self)
-        
-        # 3. Serialize data while passing request context to guarantee fully qualified absolute asset URLs
+
         serializer = OrderSerializer(
-            paginated_queryset, 
-            many=True, 
+            paginated_queryset,
+            many=True,
             context={'request': request}
         )
-        
-        # 4. Return the standardized metadata envelope response (count, next, previous, results)
-        return paginator.get_paginated_response(serializer.data)    
+
+        return paginator.get_paginated_response(serializer.data)
+
+
+class OrderStatusUpdateView(APIView):
+    """Allow staff and superusers to update an order status."""
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        if not (request.user.is_staff or request.user.is_superuser):
+            return Response({"error": "Only staff and superusers can update order status."}, status=status.HTTP_403_FORBIDDEN)
+
+        order = get_object_or_404(Order, pk=pk)
+        new_status = request.data.get('status', '').strip()
+
+        if new_status not in dict(Order.STATUS_CHOICES):
+            return Response({"error": "Invalid order status."}, status=status.HTTP_400_BAD_REQUEST)
+
+        order.status = new_status
+        if new_status == 'Paid':
+            order.is_paid = True
+        elif new_status in {'Cancelled', 'Pending'}:
+            order.is_paid = False
+
+        order.save(update_fields=['status', 'is_paid', 'updated_at'])
+        serializer = OrderSerializer(order, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
      
     

@@ -39,6 +39,12 @@ class CustomUserManager(BaseUserManager):
     
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    APPROVAL_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
     email = models.EmailField(max_length=255, unique=True, db_index=True)
     phone_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
     first_name = models.CharField(max_length=50, blank=True)
@@ -48,6 +54,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # System & Permission Matrix Flags
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_CHOICES, default='approved')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

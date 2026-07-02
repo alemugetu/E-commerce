@@ -9,6 +9,7 @@ export { AdminTabContext, useAdminTab } from '../context/AdminTabContext';
 const NAV_ITEMS = [
   { tab: 'overview', label: 'Dashboard Overview', icon: '▣' },
   { tab: 'products', label: 'Products', icon: '⬡' },
+  { tab: 'customers', label: 'Customers', icon: '◫' },
   { tab: 'admin-users', label: 'Admin Users', icon: '⊕' },
 ];
 
@@ -57,12 +58,12 @@ const AdminLayout = () => {
 
   return (
     <AdminTabContext.Provider value={{ activeTab, setActiveTab }}>
-      <div className="min-h-screen bg-slate-950 font-body text-slate-100">
-        <div className="flex min-h-screen">
+      <div className="h-screen overflow-hidden bg-slate-950 font-body text-slate-100">
+        <div className="flex h-full">
 
           {/* ── Sidebar ─────────────────────────────────────────────────── */}
           <aside className={`
-            fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-800 bg-slate-900
+            fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-800 bg-slate-900 flex-shrink-0 h-screen overflow-hidden 
             transition-transform duration-200 ease-in-out
             ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
             lg:static lg:translate-x-0
@@ -92,9 +93,11 @@ const AdminLayout = () => {
                 {user ? (
                   <>
                     <p className="truncate text-sm font-semibold text-slate-100 leading-tight">
-                      {displayName || emailLine}
+                      {displayName}
                     </p>
-                    <p className="truncate text-[11px] text-slate-400 mt-0.5">{emailLine}</p>
+                    {displayName !== emailLine && emailLine && (
+                      <p className="truncate text-[11px] text-slate-400 mt-0.5">{emailLine}</p>
+                    )}
                     <span className="mt-1 inline-block rounded-full border border-indigo-700 bg-indigo-950 px-2 py-0.5 text-[9px] font-bold text-indigo-300">
                       {user.is_superuser ? 'Superuser' : 'Staff'}
                     </span>

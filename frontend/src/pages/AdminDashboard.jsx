@@ -254,6 +254,27 @@ const AdminUsersTab = () => {
   const { user } = useAuth();
   const [form, setForm] = useState(INITIAL_ADMIN_FORM);
   const [busy, setBusy] = useState(false);
+  const [admins, setAdmins] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [loadingAdmins, setLoadingAdmins] = useState(false);
+
+  const loadAdminUsers = useCallback(async () => {
+    if (!user?.is_superuser) return;
+    setLoadingAdmins(true);
+    try {
+      const { data } = await api.get('/custom-admin/users/manage/');
+      setAdmins(data.results ?? []);
+      setSummary(data.summary ?? null);
+    } catch {
+      toast.error('Unable to load admin-user roster.');
+    } finally {
+      setLoadingAdmins(false);
+    }
+  }, [user?.is_superuser]);
+
+  useEffect(() => {
+    loadAdminUsers();
+  }, [loadAdminUsers]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -267,9 +288,31 @@ const AdminUsersTab = () => {
       const { data } = await api.post('/custom-admin/users/', form);
       toast.success(`Admin account created for ${data.email}.`);
       setForm(INITIAL_ADMIN_FORM);
+      loadAdminUsers();
     } catch (err) {
       toast.error(err.response?.data?.error || err.response?.data?.detail || 'Failed to create admin account.');
     } finally { setBusy(false); }
+  };
+
+  const handleToggleActive = async (admin) => {
+    try {
+      await api.patch(`/custom-admin/users/${admin.id}/`, { is_active: !admin.is_active });
+      toast.success(`${admin.email} ${admin.is_active ? 'blocked' : 'reactivated'}.`);
+      loadAdminUsers();
+    } catch {
+      toast.error('Unable to update this admin account.');
+    }
+  };
+
+  const handleDelete = async (admin) => {
+    if (!window.confirm(`Remove ${admin.email} from admin access?`)) return;
+    try {
+      await api.delete(`/custom-admin/users/${admin.id}/`);
+      toast.success(`${admin.email} removed from admin access.`);
+      loadAdminUsers();
+    } catch {
+      toast.error('Unable to remove this admin account.');
+    }
   };
 
   return (
@@ -277,19 +320,38 @@ const AdminUsersTab = () => {
       <div>
         <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-400">Access Control</p>
         <h2 className="mt-1 text-2xl font-black text-slate-100">Admin User Provisioning</h2>
-        <p className="mt-1 text-sm text-slate-400">Grant staff or superuser privileges to management accounts.</p>
+        <p className="mt-1 text-sm text-slate-400">Superusers can manage admin accounts, block access, and remove staff or superuser accounts.</p>
       </div>
 
-      {!user?.is_staff ? (
+      {!user?.is_superuser ? (
         <div className="rounded-2xl border border-amber-800/40 bg-amber-900/20 p-6 text-sm text-amber-300">
-          <p className="font-bold mb-1">&#x26A0; Staff Access Required</p>
-          <p className="text-amber-400/80">You need staff access to provision new admin accounts.</p>
+          <p className="font-bold mb-1">⚠ Superuser Access Required</p>
+          <p className="text-amber-400/80">Only a superuser can manage admin accounts.</p>
         </div>
       ) : (
-        <div className="max-w-lg">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Total Admins</p>
+              <p className="mt-2 text-2xl font-black text-slate-100">{summary?.total_admins ?? admins.length}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Staff Users</p>
+              <p className="mt-2 text-2xl font-black text-slate-100">{summary?.staff_users ?? 0}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Superusers</p>
+              <p className="mt-2 text-2xl font-black text-slate-100">{summary?.superusers ?? 0}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Inactive Admins</p>
+              <p className="mt-2 text-2xl font-black text-slate-100">{summary?.inactive_admins ?? 0}</p>
+            </div>
+          </div>
+
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
             <h3 className="text-base font-bold text-slate-100 mb-1">Create Admin Account</h3>
-            <p className="text-xs text-slate-400 mb-5">New accounts are created via <code className="text-indigo-400">POST /api/custom-admin/users/</code></p>
+            <p className="text-xs text-slate-400 mb-5">Complete the form to create a new administrator with the selected permissions.</p>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div><label className={labelCls}>Email *</label><input type="email" name="email" value={form.email} onChange={handleChange} className={inputCls} required /></div>
@@ -314,6 +376,192 @@ const AdminUsersTab = () => {
               </button>
             </form>
           </section>
+
+          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <div>
+                <h3 className="text-base font-bold text-slate-100">Current Admin Accounts</h3>
+                <p className="text-xs text-slate-400 mt-0.5">Block access or remove staff/superuser accounts from the system.</p>
+              </div>
+              <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-400">{loadingAdmins ? 'Loading…' : `${admins.length} admins`}</span>
+            </div>
+            {loadingAdmins ? (
+              <div className="space-y-2">{[1, 2, 3].map(i => <RowSkeleton key={i} />)}</div>
+            ) : admins.length === 0 ? (
+              <div className="py-10 text-center text-sm text-slate-500">No admin accounts found.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-800 text-left text-sm">
+                  <thead>
+                    <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                      <th className="py-2.5 pr-4">Email</th>
+                      <th className="py-2.5 pr-4">Role</th>
+                      <th className="py-2.5 pr-4">Status</th>
+                      <th className="py-2.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {admins.map(admin => (
+                      <tr key={admin.id} className="hover:bg-slate-800/30 transition-colors">
+                        <td className="py-3 pr-4 font-semibold text-slate-100">{admin.email}</td>
+                        <td className="py-3 pr-4 text-slate-300">{admin.is_superuser ? 'Superuser' : 'Staff'}</td>
+                        <td className="py-3 pr-4">
+                          <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${admin.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                            {admin.is_active ? 'Active' : 'Blocked'}
+                          </span>
+                        </td>
+                        <td className="py-3 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button onClick={() => handleToggleActive(admin)} className="rounded-lg border border-slate-700 bg-slate-800/60 px-2.5 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-700">
+                              {admin.is_active ? 'Block' : 'Reactivate'}
+                            </button>
+                            <button onClick={() => handleDelete(admin)} className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-2.5 py-1.5 text-xs font-semibold text-rose-400 transition hover:bg-rose-500/20">
+                              Remove
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB 4 — Customers (approval workflow)
+// ══════════════════════════════════════════════════════════════════════════════
+const CustomersTab = () => {
+  const { user } = useAuth();
+  const [customers, setCustomers] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const loadCustomers = useCallback(async () => {
+    if (!user?.is_staff && !user?.is_superuser) return;
+    setLoading(true);
+    try {
+      const { data } = await api.get('/auth/customers/');
+      setCustomers(data.results ?? []);
+      setSummary(data.summary ?? null);
+    } catch {
+      toast.error('Unable to load customer approvals.');
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.is_staff, user?.is_superuser]);
+
+  useEffect(() => { loadCustomers(); }, [loadCustomers]);
+
+  const handleApprove = async (customer) => {
+    try {
+      await api.patch(`/auth/customers/${customer.id}/`, { approval_status: 'approved' });
+      toast.success(`${customer.email} approved.`);
+      loadCustomers();
+    } catch {
+      toast.error('Unable to update approval status.');
+    }
+  };
+
+  const handleReject = async (customer) => {
+    try {
+      await api.patch(`/auth/customers/${customer.id}/`, { approval_status: 'rejected' });
+      toast.success(`${customer.email} rejected.`);
+      loadCustomers();
+    } catch {
+      toast.error('Unable to update approval status.');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-400">Customer Access</p>
+        <h2 className="mt-1 text-2xl font-black text-slate-100">Approval Workflow</h2>
+        <p className="mt-1 text-sm text-slate-400">Staff can review new customer signups and approve or reject access.</p>
+      </div>
+
+      {!user?.is_staff && !user?.is_superuser ? (
+        <div className="rounded-2xl border border-amber-800/40 bg-amber-900/20 p-6 text-sm text-amber-300">
+          <p className="font-bold mb-1">⚠ Staff Access Required</p>
+          <p className="text-amber-400/80">Only staff or superusers can review customer approvals.</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Total Customers</p>
+              <p className="mt-2 text-2xl font-black text-slate-100">{summary?.total ?? customers.length}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Pending</p>
+              <p className="mt-2 text-2xl font-black text-slate-100">{summary?.pending ?? 0}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Approved</p>
+              <p className="mt-2 text-2xl font-black text-slate-100">{summary?.approved ?? 0}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Rejected</p>
+              <p className="mt-2 text-2xl font-black text-slate-100">{summary?.rejected ?? 0}</p>
+            </div>
+          </div>
+
+          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <div>
+                <h3 className="text-base font-bold text-slate-100">Customer Requests</h3>
+                <p className="text-xs text-slate-400 mt-0.5">Approve or reject new customer accounts.</p>
+              </div>
+              <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-400">{loading ? 'Loading…' : `${customers.length} accounts`}</span>
+            </div>
+            {loading ? (
+              <div className="space-y-2">{[1, 2, 3].map(i => <RowSkeleton key={i} />)}</div>
+            ) : customers.length === 0 ? (
+              <div className="py-10 text-center text-sm text-slate-500">No customer accounts pending review.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-800 text-left text-sm">
+                  <thead>
+                    <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                      <th className="py-2.5 pr-4">Email</th>
+                      <th className="py-2.5 pr-4">Name</th>
+                      <th className="py-2.5 pr-4">Status</th>
+                      <th className="py-2.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {customers.map(customer => (
+                      <tr key={customer.id} className="hover:bg-slate-800/30 transition-colors">
+                        <td className="py-3 pr-4 font-semibold text-slate-100">{customer.email}</td>
+                        <td className="py-3 pr-4 text-slate-300">{[customer.first_name, customer.last_name].filter(Boolean).join(' ') || '—'}</td>
+                        <td className="py-3 pr-4">
+                          <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${customer.approval_status === 'approved' ? 'bg-emerald-500/10 text-emerald-400' : customer.approval_status === 'rejected' ? 'bg-rose-500/10 text-rose-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                            {customer.approval_status}
+                          </span>
+                        </td>
+                        <td className="py-3 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button onClick={() => handleApprove(customer)} className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-400 transition hover:bg-emerald-500/20">
+                              Approve
+                            </button>
+                            <button onClick={() => handleReject(customer)} className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-2.5 py-1.5 text-xs font-semibold text-rose-400 transition hover:bg-rose-500/20">
+                              Reject
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
         </div>
       )}
     </div>
@@ -330,6 +578,7 @@ const AdminDashboard = () => {
     <div className="min-h-full">
       {activeTab === 'overview' && <OverviewTab />}
       {activeTab === 'products' && <ProductsTab />}
+      {activeTab === 'customers' && <CustomersTab />}
       {activeTab === 'admin-users' && <AdminUsersTab />}
     </div>
   );
