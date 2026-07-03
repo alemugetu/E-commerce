@@ -68,6 +68,7 @@ class Product(models.Model):
     # Inventory control management
     stock = models.PositiveIntegerField(default=0)
     is_available = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)  # Soft delete flag
     # Reviews and ratings tracking aggregates
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     num_reviews = models.PositiveIntegerField(default=0)

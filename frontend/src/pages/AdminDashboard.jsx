@@ -85,6 +85,7 @@ const OverviewTab = () => {
 // TAB 2 — Products (create form + inventory table)
 // ══════════════════════════════════════════════════════════════════════════════
 const ProductsTab = () => {
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [categories, setCategories] = useState([]);
@@ -94,8 +95,14 @@ const ProductsTab = () => {
 
   const loadProducts = useCallback(async () => {
     setProductsLoading(true);
-    try { const { data } = await api.get('/products/'); setProducts(data.results ?? data ?? []); }
-    catch { toast.error('Failed to load product inventory.'); }
+    try {
+      const { data } = await api.get('/products/');
+      setProducts(data.results ?? data ?? []);
+    } catch (err) {
+      console.error('Load products error:', err.response);
+      const errorMsg = err.response?.data?.detail || err.response?.data?.error || err.message || 'Failed to load product inventory.';
+      toast.error(errorMsg);
+    }
     finally { setProductsLoading(false); }
   }, []);
 
@@ -111,6 +118,10 @@ const ProductsTab = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user?.is_superuser) {
+      toast.error('Only superusers can create products.');
+      return;
+    }
     setFormBusy(true);
 
     let categoryId = formData.category;
@@ -155,10 +166,30 @@ const ProductsTab = () => {
     } finally { setFormBusy(false); }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
-    try { await api.delete(`/products/${id}/`); toast.success(`"${name}" removed.`); loadProducts(); }
-    catch { toast.error('Delete failed — check permissions.'); }
+  const handleDelete = async (id, name, isActive) => {
+    if (!user?.is_superuser) {
+      toast.error('Only superusers can delete products.');
+      return;
+    }
+    const action = isActive ? 'deactivate' : 'activate';
+    const message = isActive
+      ? `Deactivate "${name}"? It will be hidden from the store but preserved in order history.`
+      : `Reactivate "${name}"? It will be visible in the store again.`;
+    if (!window.confirm(message)) return;
+    try {
+      if (isActive) {
+        await api.delete(`/products/${id}/`);
+        toast.success(`"${name}" deactivated.`);
+      } else {
+        await api.patch(`/products/${id}/`, { is_active: true });
+        toast.success(`"${name}" reactivated.`);
+      }
+      loadProducts();
+    } catch (err) {
+      const errorMsg = err.response?.data?.detail || err.response?.data?.error || err.message || 'Operation failed.';
+      console.error('Product toggle error:', err.response);
+      toast.error(errorMsg);
+    }
   };
 
   return (
@@ -170,7 +201,8 @@ const ProductsTab = () => {
       </div>
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1.1fr]">
         {/* ── Create form ── */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+        {user?.is_superuser ? (
+          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
           <h3 className="text-base font-bold text-slate-100 mb-1">Record New Product</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -217,6 +249,15 @@ const ProductsTab = () => {
             </button>
           </form>
         </section>
+        ) : (
+          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+            <div className="text-center py-12">
+              <p className="text-4xl mb-4">🔒</p>
+              <h3 className="text-lg font-bold text-slate-100">Superuser Access Required</h3>
+              <p className="text-sm text-slate-400 mt-2">Only superusers can create new products.</p>
+            </div>
+          </section>
+        )}
         {/* ── Inventory table ── */}
         <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
           <div className="mb-4 flex items-center justify-between gap-2">
@@ -227,16 +268,32 @@ const ProductsTab = () => {
             : products.length === 0 ? <div className="py-16 text-center text-sm text-slate-500">No products yet — use the form to add the first one.</div>
               : <div className="overflow-x-auto"><table className="min-w-full divide-y divide-slate-800 text-left text-sm">
                 <thead><tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
-                  <th className="py-2.5 pr-4 pl-1">Name</th><th className="py-2.5 pr-4">Price</th><th className="py-2.5 pr-4">Stock</th><th className="py-2.5 pr-4">Status</th><th className="py-2.5 pl-1 text-right">Action</th>
+                  <th className="py-2.5 pr-4 pl-1">Name</th><th className="py-2.5 pr-4">Price</th><th className="py-2.5 pr-4">Stock</th><th className="py-2.5 pr-4">Status</th><th className="py-2.5 pr-4">Active</th><th className="py-2.5 pl-1 text-right">Action</th>
                 </tr></thead>
                 <tbody className="divide-y divide-slate-800/60">
                   {products.map(p => (
-                    <tr key={p.id} className="hover:bg-slate-800/30 transition-colors">
+                    <tr key={p.id} className={`hover:bg-slate-800/30 transition-colors ${!p.is_active ? 'opacity-50' : ''}`}>
                       <td className="py-3 pr-4 pl-1 font-semibold text-slate-100 max-w-[160px] truncate">{p.name}</td>
                       <td className="py-3 pr-4 text-slate-300">{Number(p.price).toLocaleString()} ETB</td>
                       <td className="py-3 pr-4"><span className={`text-xs font-bold px-2 py-0.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>{p.stock}</span></td>
                       <td className="py-3 pr-4"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${p.is_available ? 'bg-indigo-500/10 text-indigo-400' : 'bg-slate-700 text-slate-500'}`}>{p.is_available ? 'Live' : 'Hidden'}</span></td>
-                      <td className="py-3 pl-1 text-right"><button onClick={() => handleDelete(p.id, p.name)} className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-2.5 py-1.5 text-xs font-semibold text-rose-400 transition hover:bg-rose-500/20">Delete</button></td>
+                      <td className="py-3 pr-4"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${p.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>{p.is_active ? 'Yes' : 'No'}</span></td>
+                      <td className="py-3 pl-1 text-right">
+                        {user?.is_superuser ? (
+                          <button
+                            onClick={() => handleDelete(p.id, p.name, p.is_active)}
+                            className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition ${
+                              p.is_active
+                                ? 'border-rose-500/20 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20'
+                                : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+                            }`}
+                          >
+                            {p.is_active ? 'Deactivate' : 'Reactivate'}
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-slate-500 italic">Superuser only</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -434,7 +491,156 @@ const AdminUsersTab = () => {
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
-// TAB 4 — Customers (approval workflow)
+// TAB 4 — Orders (admin order management)
+// ══════════════════════════════════════════════════════════════════════════════
+const OrdersTab = () => {
+  const { user } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState({ hasNext: false, hasPrev: false, total: 0 });
+  const [updatingId, setUpdatingId] = useState(null);
+
+  const statusStyle = (status) => {
+    switch (status) {
+      case 'Paid':        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'Pending':     return 'bg-amber-50  text-amber-700  border-amber-200';
+      case 'Processing':  return 'bg-blue-50   text-blue-700   border-blue-200';
+      case 'Shipped':     return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+      case 'Delivered':   return 'bg-teal-50   text-teal-700   border-teal-200';
+      case 'Cancelled':   return 'bg-rose-50   text-rose-700   border-rose-200';
+      default:            return 'bg-slate-50  text-slate-600  border-slate-200';
+    }
+  };
+
+  const loadOrders = useCallback(async (targetPage) => {
+    setLoading(true);
+    try {
+      const { data } = await api.get(`/orders/admin/orders/?page=${targetPage}`);
+      setOrders(data.results ?? []);
+      setMeta({
+        hasNext: !!data.next,
+        hasPrev: !!data.previous,
+        total:   data.count ?? 0,
+      });
+    } catch {
+      toast.error('Failed to load orders.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadOrders(page); }, [page, loadOrders]);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    setUpdatingId(orderId);
+    try {
+      await api.patch(`/orders/orders/${orderId}/status/`, { status: newStatus });
+      await loadOrders(page);
+      toast.success('Order status updated.');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update order status.');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-400">Order Management</p>
+        <h2 className="mt-1 text-2xl font-black text-slate-100">All Orders</h2>
+        <p className="mt-1 text-sm text-slate-400">View and manage all customer orders.</p>
+      </div>
+
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div>
+            <h3 className="text-base font-bold text-slate-100">Order List</h3>
+            <p className="text-xs text-slate-400 mt-0.5">All orders in the system.</p>
+          </div>
+          <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-400">{loading ? 'Loading…' : `${meta.total} orders`}</span>
+        </div>
+
+        {loading ? (
+          <div className="space-y-2">{[1, 2, 3].map(i => <RowSkeleton key={i} />)}</div>
+        ) : orders.length === 0 ? (
+          <div className="py-10 text-center text-sm text-slate-500">No orders found.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-800 text-left text-sm">
+              <thead>
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                  <th className="py-2.5 pr-4">Order ID</th>
+                  <th className="py-2.5 pr-4">Customer</th>
+                  <th className="py-2.5 pr-4">Contact</th>
+                  <th className="py-2.5 pr-4">Date</th>
+                  <th className="py-2.5 pr-4">Total</th>
+                  <th className="py-2.5 pr-4">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {orders.map(order => (
+                  <tr key={order.id} className="hover:bg-slate-800/30 transition-colors">
+                    <td className="py-3 pr-4 font-mono text-xs text-slate-300">#{order.id}</td>
+                    <td className="py-3 pr-4">
+                      <div className="text-slate-100 font-medium text-sm">{order.customer_name || 'Unknown'}</div>
+                      <div className="text-xs text-slate-400">{order.customer_email}</div>
+                    </td>
+                    <td className="py-3 pr-4">
+                      <div className="text-xs text-slate-300">{order.customer_phone || 'N/A'}</div>
+                      <div className="text-xs text-slate-400 truncate max-w-[150px]">{order.customer_address || 'N/A'}</div>
+                    </td>
+                    <td className="py-3 pr-4 text-slate-300">{order.formatted_date}</td>
+                    <td className="py-3 pr-4 font-semibold text-slate-100">{Number(order.total_amount).toLocaleString()} ETB</td>
+                    <td className="py-3 pr-4">
+                      <select
+                        value={order.status}
+                        disabled={updatingId === order.id}
+                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                        className={`text-xs font-bold px-2.5 py-1 rounded-full border outline-none cursor-pointer ${statusStyle(order.status)}`}
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {(meta.hasNext || meta.hasPrev) && (
+          <div className="flex justify-between items-center mt-8 pt-4 border-t border-slate-800">
+            <button
+              disabled={!meta.hasPrev}
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              className="text-xs font-bold px-4 py-2 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
+            >
+              ← Previous
+            </button>
+            <span className="text-xs font-bold text-slate-500">Page {page}</span>
+            <button
+              disabled={!meta.hasNext}
+              onClick={() => setPage(p => p + 1)}
+              className="text-xs font-bold px-4 py-2 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
+            >
+              Next →
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB 5 — Customers (approval workflow)
 // ══════════════════════════════════════════════════════════════════════════════
 const CustomersTab = () => {
   const { user } = useAuth();
@@ -578,6 +784,7 @@ const AdminDashboard = () => {
     <div className="min-h-full">
       {activeTab === 'overview' && <OverviewTab />}
       {activeTab === 'products' && <ProductsTab />}
+      {activeTab === 'orders' && <OrdersTab />}
       {activeTab === 'customers' && <CustomersTab />}
       {activeTab === 'admin-users' && <AdminUsersTab />}
     </div>

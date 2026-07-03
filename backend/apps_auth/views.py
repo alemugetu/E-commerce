@@ -66,23 +66,36 @@ class RegisterView(APIView):
                 addresse=addresse
             )
 
-            #  Programmatically Generate a Fresh Token Bundle
-            refresh = RefreshToken.for_user(user)
-
-            return Response({
-                "message": "User registered successfully.",
-                "user": {
-                    "id": user.id,
-                    "email": user.email,
-                    "phone_number": user.phone_number,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name
-                },
-                "tokens": {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                }
-            }, status=status.HTTP_201_CREATED)
+            #  Only return tokens if user is approved (auto-approval disabled)
+            if user.approval_status == 'approved':
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    "message": "User registered successfully.",
+                    "user": {
+                        "id": user.id,
+                        "email": user.email,
+                        "phone_number": user.phone_number,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name
+                    },
+                    "tokens": {
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                    }
+                }, status=status.HTTP_201_CREATED)
+            else:
+                # Pending approval - return user data but no tokens
+                return Response({
+                    "message": "Registration successful. Your account is pending approval.",
+                    "user": {
+                        "id": user.id,
+                        "email": user.email,
+                        "phone_number": user.phone_number,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "approval_status": user.approval_status
+                    }
+                }, status=status.HTTP_201_CREATED)
 
         except Exception as e:
             # INTERNAL LOGGING ONLY

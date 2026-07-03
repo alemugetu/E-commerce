@@ -1,7 +1,7 @@
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, status
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend # pyright: ignore[reportMissingModuleSource]
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .models import Category, Product, ProductImage
 from .serializers import CategorySerializer, ProductSerializer, ProductImageSerializer
 
@@ -53,7 +53,6 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    parser_classes = [MultiPartParser, FormParser]
 
     filter_backends = [
         DjangoFilterBackend,
@@ -85,25 +84,36 @@ class ProductViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         """
         Public users can view products.
-        Administrative staff manage products.
+        Only superusers can create, update, or delete products.
         """
         if self.action in ['list', 'retrieve']:
             permission_classes = [permissions.AllowAny]
         else:
-            permission_classes = [permissions.IsAdminUser]
+            permission_classes = [permissions.IsAuthenticated]
 
         return [permission() for permission in permission_classes]
+
+    def check_permissions(self, request):
+        """
+        Additional check: only superusers can modify products.
+        """
+        super().check_permissions(request)
+        if self.action not in ['list', 'retrieve'] and not request.user.is_superuser:
+            self.permission_denied(
+                request,
+                message='Only superusers can manage products.'
+            )
 
     def get_queryset(self):
         """
         Optimizes product queries.
 
         Public listings:
-        - Only available products
+        - Only available and active products
         - Newest first
 
         Admin users:
-        - Can see all products
+        - Can see all products including inactive ones
         """
         queryset = super().get_queryset()
 
@@ -112,7 +122,8 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         if self.action == 'list':
             return queryset.filter(
-                is_available=True
+                is_available=True,
+                is_active=True
             ).select_related(
                 'category'
             ).prefetch_related(
@@ -122,12 +133,23 @@ class ProductViewSet(viewsets.ModelViewSet):
             )
 
         return queryset.filter(
-            is_available=True
+            is_available=True,
+            is_active=True
         ).select_related(
             'category'
         ).prefetch_related(
             'images'
         )
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Soft delete: mark product as inactive instead of deleting from database.
+        This preserves order history and references.
+        """
+        product = self.get_object()
+        product.is_active = False
+        product.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

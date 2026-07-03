@@ -186,14 +186,14 @@ class CheckoutAPIView(APIView):
                         status=status.HTTP_400_BAD_REQUEST
                     )
 
-                item_subtotal = product.price * item.quantity
+                item_subtotal = product.final_price * item.quantity
                 total_amount += item_subtotal
 
                 # Stage the OrderItem data structures
                 order_items_to_create.append({
                     'product': product,
                     'quantity': item.quantity,
-                    'price_at_purchase': product.price
+                    'price_at_purchase': product.final_price
                 })
 
             # 2. Build a unique tracking reference string for Chapa auditing
@@ -271,7 +271,7 @@ class OrderHistoryPagination(PageNumberPagination):
 
 class UserOrderHistoryView(APIView):
     """
-    Retrieves a paginated, chronologically sorted collection of past 
+    Retrieves a paginated, chronologically sorted collection of past
     orders submitted by the authenticated user session.
     """
     permission_classes = [IsAuthenticated]
@@ -286,6 +286,38 @@ class UserOrderHistoryView(APIView):
                 'items__product__category',
                 'items__product__images'
             )
+        )
+
+        paginator = OrderHistoryPagination()
+        paginated_queryset = paginator.paginate_queryset(orders, request, view=self)
+
+        serializer = OrderSerializer(
+            paginated_queryset,
+            many=True,
+            context={'request': request}
+        )
+
+        return paginator.get_paginated_response(serializer.data)
+
+
+class AdminOrderListView(APIView):
+    """
+    Retrieves all orders for admin/staff to view and manage.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not (request.user.is_staff or request.user.is_superuser):
+            return Response({"error": "Only staff and superusers can view all orders."}, status=status.HTTP_403_FORBIDDEN)
+
+        orders = (
+            Order.objects.all()
+            .order_by('-created_at')
+            .prefetch_related(
+                'items__product__category',
+                'items__product__images'
+            )
+            .select_related('user')
         )
 
         paginator = OrderHistoryPagination()

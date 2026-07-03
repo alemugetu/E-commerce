@@ -52,23 +52,32 @@ const Register = () => {
 
     try {
       // 2. Map payload keys perfectly to match request.data.get() rules in Django
-      await api.post('/auth/register/', {
+      const response = await api.post('/auth/register/', {
         email: formData.email,
         password: formData.password,
         phone_number: formData.phone_number || null,
         first_name: formData.first_name,
         last_name: formData.last_name,
-        addresse: formData.addresse || null, 
+        addresse: formData.addresse || null,
       });
 
-      navigate('/login', { 
-        state: { message: "Account created successfully! Please sign in." } 
-      });
+      // Check if account requires approval
+      if (response.data.tokens) {
+        // Auto-approved - navigate to login with tokens already stored
+        navigate('/login', {
+          state: { message: "Account created successfully! Please sign in." }
+        });
+      } else {
+        // Pending approval - show different message
+        navigate('/login', {
+          state: { message: "Registration successful! Your account is pending approval. You will be able to login once approved by an administrator." }
+        });
+      }
 
     } catch (error) {
       // 3. FIX: Read error.response.data.error directly from your backend's return payload
-      const errorMsg = error.response?.data?.error 
-        || error.response?.data?.detail 
+      const errorMsg = error.response?.data?.error
+        || error.response?.data?.detail
         || "Failed to create account. Please try again.";
       setLocalError(errorMsg);
     } finally {

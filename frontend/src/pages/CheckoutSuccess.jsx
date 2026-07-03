@@ -35,12 +35,12 @@ const CheckoutSuccess = () => {
       )}
 
       {/* 3. WIRE THE NAVIGATE ACTION ONCLICK TO HOME PATH '/' */}
-      <button 
+      <Button 
         onClick={() => navigate('/')} 
         className="mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-3 px-8 rounded-xl shadow-md transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
       >
         Return to Storefront
-      </button>
+      </Button>
     </div>
   );
 };

@@ -54,7 +54,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # System & Permission Matrix Flags
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    approval_status = models.CharField(max_length=20, choices=APPROVAL_CHOICES, default='approved')
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

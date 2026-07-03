@@ -94,30 +94,45 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     formatted_date = serializers.SerializerMethodField()
+    customer_name = serializers.SerializerMethodField()
+    customer_email = serializers.ReadOnlyField(source='user.email')
+    customer_phone = serializers.ReadOnlyField(source='user.phone_number')
+    customer_address = serializers.ReadOnlyField(source='user.addresse')
 
     class Meta:
         model = Order
         fields = [
-            'id', 
-            'user', 
-            'total_amount', 
-            'status', 
+            'id',
+            'user',
+            'customer_name',
+            'customer_email',
+            'customer_phone',
+            'customer_address',
+            'total_amount',
+            'status',
             'tx_ref',
-            'created_at', 
+            'created_at',
             'updated_at',
             'formatted_date',
             'items'
         ]
         read_only_fields = [
-            'user', 
-            'total_amount', 
-            'status', 
+            'user',
+            'total_amount',
+            'status',
             'tx_ref'
         ]
 
     def get_formatted_date(self, obj):
         # Emits a clean display layout for your React interface elements
         return obj.created_at.strftime("%b %d, %Y at %I:%M %p")
+
+    def get_customer_name(self, obj):
+        # Combine first and last name for display
+        user = obj.user
+        if user.first_name and user.last_name:
+            return f"{user.first_name} {user.last_name}"
+        return user.email or "Unknown"
     
 
         
