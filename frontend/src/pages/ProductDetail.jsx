@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import { useProductDetails } from '../hooks/useProductDetails';
 import { useAddToCart } from '../hooks/useAddToCart';
+import { useWishlist } from '../context/WishlistContext';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import toast from 'react-hot-toast';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -36,6 +39,8 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { data: product, isLoading, isError } = useProductDetails(id);
   const { addItem, isAdding } = useAddToCart();
+  const { toggleWishlist, checkIsInWishlist } = useWishlist();
+  const [isInWishlist, setIsInWishlist] = useState(false);
 
   // ── Image gallery state ──────────────────────────────────────────────────
   // Initialised to null; set properly once the product data arrives so we
@@ -52,6 +57,24 @@ const ProductDetail = () => {
       setActiveImage(FALLBACK_IMAGE);
     }
   }, [product]);
+
+  // Check if product is in wishlist when product loads
+  useEffect(() => {
+    if (product) {
+      setIsInWishlist(checkIsInWishlist(product.id));
+    }
+  }, [product, checkIsInWishlist]);
+
+  const handleToggleWishlist = async () => {
+    if (!product) return;
+    try {
+      await toggleWishlist(product.id);
+      setIsInWishlist(!isInWishlist);
+      toast.success(isInWishlist ? 'Removed from wishlist' : 'Added to wishlist');
+    } catch (error) {
+      toast.error('Failed to update wishlist');
+    }
+  };
 
   // ── Quantity selector state ──────────────────────────────────────────────
   const [quantity, setQuantity] = useState(1);
@@ -192,9 +215,9 @@ const ProductDetail = () => {
         {/* ── RIGHT: Product info & actions ── */}
         <div className="flex flex-col gap-6 py-2">
 
-          {/* Category chip + brand */}
+          {/* Category chip + brand + wishlist */}
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold uppercase rounded-full tracking-wider">
+            <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold uppercase rounded-full tracking-wider">
               {categoryName}
             </span>
             {product.brand && (
@@ -202,6 +225,17 @@ const ProductDetail = () => {
                 {product.brand}
               </span>
             )}
+            <button
+              onClick={handleToggleWishlist}
+              className={`p-2 rounded-full transition-colors ${
+                isInWishlist
+                  ? 'bg-red-50 text-red-500 hover:bg-red-100'
+                  : 'bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-red-500'
+              }`}
+              aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+            >
+              <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+            </button>
           </div>
 
           {/* Product name */}

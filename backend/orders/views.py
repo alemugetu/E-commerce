@@ -27,7 +27,7 @@ class CartAPIView(APIView):
     def get(self, request):
         # Fetch the cart for the user. If they don't have one, create it instantly.
         cart, created = Cart.objects.get_or_create(user=request.user)
-        serializer = CartSerializer(cart)
+        serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -67,7 +67,7 @@ class CartAPIView(APIView):
             cart_item.save()
 
         # Return the updated master cart back to the frontend
-        serializer = CartSerializer(cart)
+        serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -100,14 +100,18 @@ class CartItemDetailView(APIView):
         else:
             cart_item.quantity = new_quantity
             cart_item.save()
-
-        return Response({'message': 'Cart item updated successfully'}, status=status.HTTP_200_OK)
+        
+        cart = Cart.objects.get(user=request.user)
+        serializer = CartSerializer(cart, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
         # Securely delete the item
         cart_item = get_object_or_404(CartItem, id=pk, cart__user=request.user)
         cart_item.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        cart = Cart.objects.get(user=request.user)
+        serializer = CartSerializer(cart, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class WishlistDetailView(views.APIView):
     """
@@ -118,7 +122,7 @@ class WishlistDetailView(views.APIView):
 
     def get(self, request):
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-        serializer = WishlistSerializer(wishlist)
+        serializer = WishlistSerializer(wishlist, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from products.serializers import ProductSerializer
 from .models import Cart, CartItem, Wishlist, WishlistItem, Order, OrderItem
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -6,13 +7,12 @@ class CartItemSerializer(serializers.ModelSerializer):
     Serializes individual items in the cart. 
     Pulls specific read-only fields from the related Product model for the frontend UI.
     """
-    product_name = serializers.ReadOnlyField(source='product.name')
-    product_price = serializers.ReadOnlyField(source='product.final_price')
+    product = ProductSerializer(read_only=True)
     subtotal = serializers.ReadOnlyField()
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'product_name', 'product_price', 'quantity', 'subtotal']
+        fields = ['id', 'product', 'quantity', 'subtotal']
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -38,13 +38,11 @@ class WishlistItemSerializer(serializers.ModelSerializer):
     """
     Serializes individual products saved in the wishlist.
     """
-    # Follow the Foreign Key to grab useful UI data without extra database hits
-    product_name = serializers.ReadOnlyField(source='product.name')
-    product_price = serializers.ReadOnlyField(source='product.final_price')
+    product = ProductSerializer(read_only=True)
 
     class Meta:
         model = WishlistItem
-        fields = ['id', 'product', 'product_name', 'product_price', 'created_at']
+        fields = ['id', 'product', 'created_at']
 
 
 class WishlistSerializer(serializers.ModelSerializer):

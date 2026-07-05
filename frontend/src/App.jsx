@@ -8,6 +8,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { CartProvider } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 
 // Layout Shell Imports
 import PublicLayout from './layouts/PublicLayout';
@@ -29,6 +30,9 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import CheckoutSuccess from './pages/CheckoutSuccess';
 import OrderHistory from './pages/OrderHistory';
+import Wishlist from './pages/Wishlist';
+import About from './pages/About';
+import Contact from './pages/Contact';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPasswordConfirm from './pages/ResetPasswordConfirm';
 
@@ -66,10 +70,13 @@ const AppRouter = () => {
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="about" element={<About />} />
+        <Route path="contact" element={<Contact />} />
         <Route path="product/:id" element={<ProductDetail />} />
         <Route path="cart" element={<Cart/>} />
-        <Route path="checkout-success" element={<CheckoutSuccess/>} /> 
-        <Route path="order-history" element={<OrderHistory/>} />  
+        <Route path="wishlist" element={<Wishlist/>} />
+        <Route path="checkout-success" element={<CheckoutSuccess/>} />
+        <Route path="order-history" element={<OrderHistory/>} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:uid/:token" element={<ResetPasswordConfirm />} />
 
@@ -129,9 +136,11 @@ function App() {
       />
       <AuthProvider>
         <CartProvider>
-        <BrowserRouter>
-          <AppRouter />
-        </BrowserRouter>
+          <WishlistProvider>
+            <BrowserRouter>
+              <AppRouter />
+            </BrowserRouter>
+          </WishlistProvider>
         </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
