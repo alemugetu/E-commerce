@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { NotificationProvider } from './context/NotificationContext';
 
 // Layout Shell Imports
 import PublicLayout from './layouts/PublicLayout';
@@ -137,9 +138,11 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
-            <BrowserRouter>
-              <AppRouter />
-            </BrowserRouter>
+            <NotificationProvider>
+              <BrowserRouter>
+                <AppRouter />
+              </BrowserRouter>
+            </NotificationProvider>
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>

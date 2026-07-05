@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from products.serializers import ProductSerializer
-from .models import Cart, CartItem, Wishlist, WishlistItem, Order, OrderItem
+from .models import Cart, CartItem, Wishlist, WishlistItem, Order, OrderItem, Notification
 
 class CartItemSerializer(serializers.ModelSerializer):
     """
@@ -131,6 +131,13 @@ class OrderSerializer(serializers.ModelSerializer):
         if user.first_name and user.last_name:
             return f"{user.first_name} {user.last_name}"
         return user.email or "Unknown"
+    
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'order', 'message', 'is_read', 'created_at']
+        read_only_fields = ['id', 'order', 'message', 'created_at']
     
 
         

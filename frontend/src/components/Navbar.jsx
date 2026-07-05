@@ -1,28 +1,35 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart, Bell, User, Menu, X } from 'lucide-react';
+import { ShoppingCart, Heart, Bell, User, Menu, X, Trash2, Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useNotifications } from '../context/NotificationContext';
 import { getInitials } from '../utils/getInitials';
 
 const Navbar = () => {
   const { cartCount } = useCart();
   const { user, logout } = useAuth();
   const { wishlistCount } = useWishlist();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification } = useNotifications();
 
   // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // User dropdown state
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const userMenuRef = useRef(null);
+  const notificationsRef = useRef(null);
 
-  // Close user dropdown when clicking outside
+  // Close both dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setUserMenuOpen(false);
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(e.target)) {
+        setNotificationsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -109,15 +116,80 @@ const Navbar = () => {
                 </Link>
 
                 {/* Notifications */}
-                <button
-                  className="relative p-2 text-slate-600 hover:text-emerald-600 transition-colors"
-                  aria-label="Notifications"
-                >
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                    0
-                  </span>
-                </button>
+                <div className="relative" ref={notificationsRef}>
+                  <button
+                    onClick={() => setNotificationsOpen(prev => !prev)}
+                    className="relative p-2 text-slate-600 hover:text-emerald-600 transition-colors"
+                    aria-label="Notifications"
+                  >
+                    <Bell className="w-5 h-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Notifications Dropdown */}
+                  {notificationsOpen && (
+                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150 max-h-96 overflow-y-auto">
+                      <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                        <p className="text-sm font-semibold text-slate-900">Notifications</p>
+                        {unreadCount > 0 && (
+                          <button
+                            onClick={markAllAsRead}
+                            className="text-xs font-medium text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                          >
+                            <Check className="w-3 h-3" />
+                            Mark all as read
+                          </button>
+                        )}
+                      </div>
+
+                      {notifications.length === 0 ? (
+                        <div className="px-4 py-6 text-center">
+                          <p className="text-sm text-slate-500">No notifications yet</p>
+                        </div>
+                      ) : (
+                        <div>
+                          {notifications.map(notification => (
+                            <div
+                              key={notification.id}
+                              className={`px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors ${!notification.is_read ? 'bg-emerald-50/50' : ''}`}
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1">
+                                  <p className="text-sm text-slate-900">{notification.message}</p>
+                                  <p className="text-xs text-slate-400 mt-1">
+                                    {new Date(notification.created_at).toLocaleString()}
+                                  </p>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  {!notification.is_read && (
+                                    <button
+                                      onClick={() => markAsRead(notification.id)}
+                                      className="p-1 text-emerald-600 hover:bg-emerald-100 rounded"
+                                      aria-label="Mark as read"
+                                    >
+                                      <Check className="w-3 h-3" />
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={() => removeNotification(notification.id)}
+                                    className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded"
+                                    aria-label="Delete"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {/* User Dropdown */}
                 <div className="relative" ref={userMenuRef}>

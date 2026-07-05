@@ -7,6 +7,10 @@ from .views import (
     UserOrderHistoryView,
     AdminOrderListView,
     OrderStatusUpdateView,
+    NotificationListView,
+    NotificationReadView,
+    NotificationReadAllView,
+    NotificationDeleteView,
 )
 
 
@@ -27,4 +31,10 @@ urlpatterns = [
     path("order-history/", UserOrderHistoryView.as_view(), name="order-history"),
     path("admin/orders/", AdminOrderListView.as_view(), name="admin-order-list"),
     path("orders/<int:pk>/status/", OrderStatusUpdateView.as_view(), name="order-status-update"),
+
+    # Notifications Endpoints
+    path("notifications/", NotificationListView.as_view(), name="notification-list"),
+    path("notifications/<int:pk>/read/", NotificationReadView.as_view(), name="notification-read"),
+    path("notifications/read-all/", NotificationReadAllView.as_view(), name="notification-read-all"),
+    path("notifications/<int:pk>/", NotificationDeleteView.as_view(), name="notification-delete"),
 ]

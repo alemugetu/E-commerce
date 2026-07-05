@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Order, OrderItem
+from .models import Order, OrderItem, Notification
 
 
 class OrderItemInline(admin.TabularInline):
@@ -30,4 +30,13 @@ class OrderAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'order', 'message', 'is_read', 'created_at']
+    list_filter = ['is_read', 'created_at']
+    search_fields = ['message', 'user__email']
+    readonly_fields = ['user', 'order', 'message', 'created_at']
+    ordering = ['-created_at']
     

@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from django.shortcuts import get_object_or_404
 from products.models import Product
-from .models import Cart, CartItem
+from .models import Cart, CartItem, Notification
 from .serializers import CartSerializer
 from .models import Cart, CartItem, Wishlist, WishlistItem, Order
-from .serializers import CartSerializer, CartItemSerializer, WishlistSerializer, WishlistItemSerializer, OrderSerializer
+from .serializers import CartSerializer, CartItemSerializer, WishlistSerializer, WishlistItemSerializer, OrderSerializer, NotificationSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
@@ -349,7 +349,8 @@ class OrderStatusUpdateView(APIView):
 
         if new_status not in dict(Order.STATUS_CHOICES):
             return Response({"error": "Invalid order status."}, status=status.HTTP_400_BAD_REQUEST)
-
+        
+        old_status = order.status
         order.status = new_status
         if new_status == 'Paid':
             order.is_paid = True
@@ -357,7 +358,54 @@ class OrderStatusUpdateView(APIView):
             order.is_paid = False
 
         order.save(update_fields=['status', 'is_paid', 'updated_at'])
+        
+        # Create notification only if status changed
+        if old_status != new_status:
+            Notification.objects.create(
+                user=order.user,
+                order=order,
+                message=f"Order #{order.id} status updated to {new_status}"
+            )
+        
         serializer = OrderSerializer(order, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class NotificationListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        notifications = Notification.objects.filter(user=request.user)
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class NotificationReadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        notification = get_object_or_404(Notification, pk=pk, user=request.user)
+        notification.is_read = True
+        notification.save(update_fields=['is_read'])
+        serializer = NotificationSerializer(notification)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class NotificationReadAllView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        notifications = Notification.objects.filter(user=request.user, is_read=False)
+        notifications.update(is_read=True)
+        return Response({"message": "All notifications marked as read"}, status=status.HTTP_200_OK)
+
+
+class NotificationDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        notification = get_object_or_404(Notification, pk=pk, user=request.user)
+        notification.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
      
     
