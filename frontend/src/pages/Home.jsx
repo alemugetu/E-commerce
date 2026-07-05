@@ -1,126 +1,140 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useProducts } from '../hooks/useProducts';
-import { useAddToCart } from '../hooks/useAddToCart';
+import { HiShoppingBag, HiArrowRight, HiArrowTopRightOnSquare } from 'react-icons/hi2';
+import { useCategories } from '../hooks/useCategories';
+import { getCategoryIcon } from '../utils/categoryIcons';
 import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+
+const CategorySkeleton = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    {[...Array(4)].map((_, i) => (
+      <Card key={i} className="animate-pulse p-6 h-52">
+        <div className="bg-slate-200 w-12 h-12 rounded-xl mb-4" />
+        <div className="h-5 bg-slate-200 rounded w-2/3 mb-2" />
+        <div className="h-4 bg-slate-200 rounded w-1/3 mb-6" />
+        <div className="h-9 bg-slate-200 rounded w-full" />
+      </Card>
+    ))}
+  </div>
+);
 
 const Home = () => {
-  const { data: products, isLoading, isError, error } = useProducts();
-  const { addItem, isAdding } = useAddToCart();
-
-  if (isLoading) {
-    return (
-      <div className="py-24 max-w-7xl mx-auto px-4 text-center">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse p-4">
-              <div className="bg-slate-200 h-48 w-full rounded-lg mb-4" />
-              <div className="h-4 bg-slate-200 rounded w-2/3 mb-2" />
-              <div className="h-4 bg-slate-200 rounded w-1/2" />
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="py-24 text-center max-w-md mx-auto px-4">
-        <div className="p-6 bg-red-50 border border-red-200 rounded-2xl text-red-700">
-          <h3 className="font-bold text-lg mb-2">Failed to Load Products</h3>
-          <p className="text-sm opacity-90">{error?.message || "Please check your network connection."}</p>
-        </div>
-      </div>
-    );
-  }
-
-  const productList = Array.isArray(products)
-    ? products
-    : products?.results || products?.data || [];
-
-  if (productList.length === 0) {
-    return (
-      <div className="py-24 text-center text-slate-500 max-w-md mx-auto px-4">
-        <h3 className="font-bold text-xl text-slate-800 mb-2">No Products Found</h3>
-        <p className="text-sm">Our catalog is currently undergoing an update. Check back soon!</p>
-      </div>
-    );
-  }
+  const { data: categories = [], isLoading, isError, error } = useCategories();
 
   return (
-    <div className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mb-10">
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Explore Our Collection</h1>
-        <p className="text-slate-500 mt-2 text-sm">Premium curated hardware and tools delivered right to your door.</p>
-      </div>
+    <div className="pb-12">
+      {/* Hero Section */}
+      <section
+        aria-labelledby="hero-heading"
+        className="-mx-4 sm:-mx-6 lg:-mx-8 mb-14 sm:mb-16"
+      >
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50 via-white to-white border border-emerald-100/70 shadow-sm px-6 py-16 sm:py-20 lg:py-24 text-center">
+          <div
+            className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-emerald-100/40 blur-3xl"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-emerald-50/60 blur-3xl"
+            aria-hidden="true"
+          />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {productList.map((product) => {
-          let imageSrc = product.images?.[0]?.image_url 
-            || product.images?.[0]?.image 
-            || "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-          if (imageSrc && typeof imageSrc === 'string' && imageSrc.startsWith('/media/')) {
-            imageSrc = `http://127.0.0.1:8000${imageSrc}`;
-          }
+          <div className="relative max-w-3xl mx-auto">
+            <p className="text-xs sm:text-sm font-semibold tracking-[0.2em] uppercase text-emerald-600 mb-4">
+              Welcome to
+            </p>
+            <h1
+              id="hero-heading"
+              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight"
+            >
+              STORE.ET
+            </h1>
+            <p className="mt-5 text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
+              Ethiopia&apos;s trusted marketplace for quality products — curated selection,
+              fair prices, and delivery you can rely on.
+            </p>
 
-          const categoryLabel = product.category_detail?.name || "General";
-
-          return (
-            <Card key={product.id} className="flex flex-col justify-between overflow-hidden h-full group">
-              
-              <Link to={`/product/${product.id}`} className="block focus:outline-none cursor-pointer flex-1">
-                <div className="bg-slate-100 aspect-video w-full rounded-lg overflow-hidden relative mb-4">
-                  <img 
-                    src={imageSrc} 
-                    alt={product.name}
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-
-                <div className="px-1">
-                  <span className="text-xs font-semibold tracking-wider text-indigo-600 uppercase">
-                    {categoryLabel}
-                  </span>
-                  <h3 className="font-bold text-slate-900 text-base mt-1 line-clamp-1">
-                    {product.name}
-                  </h3>
-                  <p className="text-slate-500 text-sm mt-1 line-clamp-2 min-h-[40px]">
-                    {product.description || "No description provided."}
-                  </p>
-                </div>
+            <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center">
+              <Link
+                to="/products"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+              >
+                <HiShoppingBag className="w-5 h-5" aria-hidden="true" />
+                Shop Now
               </Link>
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-emerald-700 bg-white border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 shadow-sm transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+              >
+                Start Free / Register
+                <HiArrowRight className="w-5 h-5" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              {/* Action Footer */}
-              <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between px-1">
-                <span className="text-lg font-extrabold text-slate-900">
-                  {product.price} <span className="text-sm font-medium text-slate-500">ETB</span>
-                </span>
-                
-                {/* 3. WIRE UP THE ONCLICK EVENT HERE */}
-                <Button 
-                  variant="primary" 
-                  size="sm"
-                  disabled={isAdding}
-                  onClick={(e) => {
-                    // Prevent the click from bubbling up into the <Link> wrapper
-                    e.preventDefault();
-                    e.stopPropagation();
-                    addItem(product, 1);
-                  }}
+      {/* Categories Section */}
+      <section id="categories" className="scroll-mt-24">
+        <div className="mb-10 text-center sm:text-left">
+          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            Shop by Category
+          </h2>
+          <p className="text-slate-500 mt-2 text-sm sm:text-base">
+            Discover products organized by what matters to you.
+          </p>
+        </div>
+
+        {isLoading && <CategorySkeleton />}
+
+        {isError && (
+          <div className="py-12 text-center max-w-md mx-auto">
+            <div className="p-6 bg-red-50 border border-red-200 rounded-2xl text-red-700">
+              <h3 className="font-bold text-lg mb-2">Failed to Load Categories</h3>
+              <p className="text-sm opacity-90">
+                {error?.message || 'Please check your network connection.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {!isLoading && !isError && categories.length === 0 && (
+          <div className="py-12 text-center text-slate-500 max-w-md mx-auto">
+            <h3 className="font-bold text-xl text-slate-800 mb-2">No Categories Yet</h3>
+            <p className="text-sm">Categories will appear here once they are added.</p>
+          </div>
+        )}
+
+        {!isLoading && !isError && categories.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {categories.map((category) => {
+              const Icon = getCategoryIcon(category.name, category.slug);
+
+              return (
+                <Card
+                  key={category.id}
+                  className="group flex flex-col h-full p-6 hover:shadow-lg hover:border-emerald-200 transition-all duration-300 hover:-translate-y-1"
                 >
-                  {isAdding ? 'Adding…' : 'Add to Cart'}
-                </Button>
-              </div>
+                  <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
+                    <Icon className="w-6 h-6" aria-hidden="true" />
+                  </div>
 
-            </Card>
-          );
-        })}
-      </div>
+                  <h3 className="text-lg font-bold text-slate-900">{category.name}</h3>
+
+                  <Link
+                    to={`/products?category=${category.slug}`}
+                    className="mt-auto pt-6 inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-emerald-700 border border-emerald-200 bg-white hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all duration-200"
+                  >
+                    Explore
+                    <HiArrowTopRightOnSquare className="w-4 h-4" aria-hidden="true" />
+                  </Link>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </div>
   );
 };
 
 export default Home;
-

@@ -43,7 +43,7 @@ const Input = ({
           disabled:cursor-not-allowed
           ${error 
             ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100" 
-            : "border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"}
+            : "border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"}
         `}
         {...props}
       />

@@ -36,6 +36,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPasswordConfirm from './pages/ResetPasswordConfirm';
+import Products from './pages/Products';
 
 
 // 2. Instantiate a global QueryClient configuration block
@@ -56,7 +57,7 @@ const AppRouter = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-4">
-        <div className="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
         <p className="text-sm font-medium text-slate-400 tracking-wide animate-pulse">
           Establishing Secure Connection...
         </p>
@@ -73,6 +74,7 @@ const AppRouter = () => {
         <Route path="register" element={<Register />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="products" element={<Products />} />
         <Route path="product/:id" element={<ProductDetail />} />
         <Route path="cart" element={<Cart/>} />
         <Route path="wishlist" element={<Wishlist/>} />

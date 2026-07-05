@@ -1,13 +1,14 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Navbar from '../components/Navbar'; // Up one directory to src/, then into components
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const PublicLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-950 font-body">
+    <div className="min-h-screen flex flex-col bg-white text-slate-950 font-body">
 
       {/* Global Announcement Bar */}
-      <div className="bg-indigo-600 text-white text-xs font-medium py-2 px-4 text-center">
+      <div className="bg-emerald-600 text-white text-xs font-medium py-2 px-4 text-center">
         Free shipping on all orders over 5,000 Birr!
       </div>
 
@@ -19,12 +20,8 @@ const PublicLayout = () => {
         <Outlet />
       </main>
 
-      {/* Footer Zone */}
-      <footer className="bg-white border-t border-slate-200 py-6 px-6 text-center text-sm text-slate-500">
-        <div className="max-w-7xl mx-auto">
-          &copy; {new Date().getFullYear()} STORE.ET. All rights reserved.
-        </div>
-      </footer>
+      {/* New Professional Footer */}
+      <Footer />
 
     </div>
   );

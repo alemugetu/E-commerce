@@ -8,10 +8,10 @@ const Button = ({
 }) => {
   const variants = {
     primary:
-      "bg-indigo-500 hover:bg-indigo-600 text-white",
+      "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20",
 
     secondary:
-      "bg-emerald-500 hover:bg-emerald-600 text-white",
+      "border border-emerald-200 bg-white hover:bg-emerald-50 text-emerald-700",
 
     danger:
       "bg-red-500 hover:bg-red-600 text-white",

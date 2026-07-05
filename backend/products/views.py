@@ -33,7 +33,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
 
         if self.action == 'list':
-            return queryset.filter(parent=None)
+            return queryset.filter(parent=None).prefetch_related('children')
 
         return queryset
 
@@ -121,16 +121,28 @@ class ProductViewSet(viewsets.ModelViewSet):
             return queryset
 
         if self.action == 'list':
-            return queryset.filter(
+            queryset = queryset.filter(
                 is_available=True,
                 is_active=True
             ).select_related(
                 'category'
             ).prefetch_related(
                 'images'
-            ).order_by(
-                '-created_at'
             )
+
+            params = self.request.query_params
+            price_min = params.get('price_min')
+            price_max = params.get('price_max')
+            min_rating = params.get('min_rating')
+
+            if price_min:
+                queryset = queryset.filter(price__gte=price_min)
+            if price_max:
+                queryset = queryset.filter(price__lte=price_max)
+            if min_rating:
+                queryset = queryset.filter(rating__gte=min_rating)
+
+            return queryset.order_by('-created_at')
 
         return queryset.filter(
             is_available=True,

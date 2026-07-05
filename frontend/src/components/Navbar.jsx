@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart, Bell, User, Menu, X, Trash2, Check } from 'lucide-react';
+import { ShoppingCart, Heart, Bell, User, Menu, X, Trash2, Check, Home, Store, Info, Mail } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -58,26 +58,30 @@ const Navbar = () => {
           <nav className="hidden md:flex items-center gap-8">
             <Link
               to="/"
-              className="text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
             >
+              <Home className="w-4 h-4" />
               Home
             </Link>
             <Link
-              to="/"
-              className="text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
+              to="/products"
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
             >
+              <Store className="w-4 h-4" />
               Products
             </Link>
             <Link
               to="/about"
-              className="text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
             >
+              <Info className="w-4 h-4" />
               About
             </Link>
             <Link
               to="/contact"
-              className="text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
             >
+              <Mail className="w-4 h-4" />
               Contact
             </Link>
           </nav>
@@ -340,13 +344,15 @@ const Navbar = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-emerald-600 rounded-lg transition-colors"
                   >
+                    <Home className="w-5 h-5" />
                     Home
                   </Link>
                   <Link
-                    to="/"
+                    to="/products"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-emerald-600 rounded-lg transition-colors"
                   >
+                    <Store className="w-5 h-5" />
                     Products
                   </Link>
                   <Link
@@ -354,6 +360,7 @@ const Navbar = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-emerald-600 rounded-lg transition-colors"
                   >
+                    <Info className="w-5 h-5" />
                     About
                   </Link>
                   <Link
@@ -361,6 +368,7 @@ const Navbar = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-emerald-600 rounded-lg transition-colors"
                   >
+                    <Mail className="w-5 h-5" />
                     Contact
                   </Link>
                 </div>

@@ -3,7 +3,7 @@ export const COLORS = {
   surface: "#1E293B",
   border: "#475569",
 
-  primary: "#6366F1",
+  primary: "#10B981",
   success: "#10B981",
   danger: "#EF4444",
 

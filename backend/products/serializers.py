@@ -7,20 +7,20 @@ class CategorySerializer(serializers.ModelSerializer):
     Serializer for the hierarchical Category model.
     Recursively pulls child subcategories to deliver a clean nested tree to the UI.
     """
-    # Using 'children' related_name to recursively embed sub-categories.
-    # read_only=True ensures this structural tree is only modified explicitly or via admin.
     children = serializers.SerializerMethodField()
+    product_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
         fields = [
-            'id', 
-            'name', 
-            'slug', 
-            'parent', 
-            'children', 
-            'created_at', 
-            'updated_at'
+            'id',
+            'name',
+            'slug',
+            'parent',
+            'children',
+            'product_count',
+            'created_at',
+            'updated_at',
         ]
         read_only_fields = ['slug', 'created_at', 'updated_at']
 
@@ -28,10 +28,24 @@ class CategorySerializer(serializers.ModelSerializer):
         """
         Calculates and serializes subcategories recursively.
         """
-        # obj.children references the related_name on the parent ForeignKey.
         if obj.children.exists():
             return CategorySerializer(obj.children.all(), many=True, context=self.context).data
         return []
+
+    def get_product_count(self, obj):
+        """Count available products in this category and all subcategories."""
+        category_ids = [obj.id]
+        stack = list(obj.children.all())
+        while stack:
+            category = stack.pop()
+            category_ids.append(category.id)
+            stack.extend(category.children.all())
+
+        return Product.objects.filter(
+            category_id__in=category_ids,
+            is_available=True,
+            is_active=True,
+        ).count()
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
