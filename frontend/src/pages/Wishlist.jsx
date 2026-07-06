@@ -9,6 +9,9 @@ const Wishlist = () => {
   const { wishlistItems, loading, toggleWishlist } = useWishlist();
   const { addToCart } = useCart();
 
+  // Ensure wishlistItems is always an array
+  const safeWishlistItems = Array.isArray(wishlistItems) ? wishlistItems : [];
+
   const handleRemoveFromWishlist = async (productId) => {
     try {
       await toggleWishlist(productId);
@@ -37,14 +40,14 @@ const Wishlist = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900">My Wishlist</h1>
         <p className="text-slate-600 mt-2">
-          {wishlistItems.length === 0
+          {safeWishlistItems.length === 0
             ? 'Your wishlist is empty'
-            : `${wishlistItems.length} item${wishlistItems.length !== 1 ? 's' : ''} saved`}
+            : `${safeWishlistItems.length} item${safeWishlistItems.length !== 1 ? 's' : ''} saved`}
         </p>
       </div>
 
       {/* Wishlist Items */}
-      {wishlistItems.length === 0 ? (
+      {safeWishlistItems.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
           <Heart className="w-16 h-16 text-slate-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-slate-900 mb-2">Your wishlist is empty</h3>
@@ -58,7 +61,7 @@ const Wishlist = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {wishlistItems.map((item) => {
+          {safeWishlistItems.map((item) => {
             const product = item.product;
             return (
               <div

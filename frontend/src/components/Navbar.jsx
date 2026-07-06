@@ -323,7 +323,7 @@ const Navbar = () => {
           />
 
           {/* Drawer */}
-          <div className="absolute right-0 top-0 h-full w-72 bg-white shadow-xl animate-in slide-in-from-right duration-300">
+          <div className="absolute right-0 top-0 h-full w-72 bg-white shadow-xl z-10 animate-in slide-in-from-right duration-300">
             <div className="flex flex-col h-full">
               {/* Drawer Header */}
               <div className="flex items-center justify-between p-4 border-b border-slate-200">

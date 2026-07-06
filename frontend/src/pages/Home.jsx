@@ -65,7 +65,7 @@ const Home = () => {
                 to="/register"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-emerald-700 bg-white border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 shadow-sm transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
               >
-                Start Free / Register
+                Start Free 
                 <HiArrowRight className="w-5 h-5" aria-hidden="true" />
               </Link>
             </div>
