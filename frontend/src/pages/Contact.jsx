@@ -45,7 +45,7 @@ const Contact = () => {
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white rounded-xl p-6 border border-slate-200">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Get in Touch</h2>
-            
+
             <div className="space-y-4">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -64,8 +64,8 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900">Phone</h3>
-                  <p className="text-slate-600 text-sm">+251 911 123 456</p>
-                  <p className="text-slate-600 text-sm">+251 911 789 012</p>
+                  <p className="text-slate-600 text-sm">+251 984 948 875 </p>
+                  <p className="text-slate-600 text-sm">+251 918 731 624</p>
                 </div>
               </div>
 
@@ -76,7 +76,7 @@ const Contact = () => {
                 <div>
                   <h3 className="font-semibold text-slate-900">Address</h3>
                   <p className="text-slate-600 text-sm">
-                    Bole Subcity, Addis Ababa<br />
+                    Azezo Subcity, Gondar <br />
                     Ethiopia
                   </p>
                 </div>
@@ -134,7 +134,7 @@ const Contact = () => {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl p-6 md:p-8 border border-slate-200">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Send us a Message</h2>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -229,7 +229,7 @@ const Contact = () => {
           <div className="text-center">
             <MapPin className="w-12 h-12 text-slate-400 mx-auto mb-2" />
             <p className="text-slate-600 font-medium">Interactive Map</p>
-            <p className="text-slate-500 text-sm">Bole Subcity, Addis Ababa, Ethiopia</p>
+            <p className="text-slate-500 text-sm">Azezo Subcity, Gondar , Ethiopia</p>
           </div>
         </div>
       </div>

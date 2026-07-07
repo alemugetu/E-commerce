@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useNotifications } from '../context/NotificationContext';
 import { getInitials } from '../utils/getInitials';
+import { createPortal } from 'react-dom';
 
 const Navbar = () => {
   const { cartCount } = useCart();
@@ -314,8 +315,8 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Menu Drawer */}
-      {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50">
+      {mobileMenuOpen && createPortal(
+        <div className="md:hidden fixed inset-0 z-[100]">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -323,7 +324,7 @@ const Navbar = () => {
           />
 
           {/* Drawer */}
-          <div className="absolute right-0 top-0 h-full w-72 bg-white shadow-xl z-10 animate-in slide-in-from-right duration-300">
+          <div className="absolute right-0 top-0 h-full w-72 bg-white shadow-xl z-10 ">
             <div className="flex flex-col h-full">
               {/* Drawer Header */}
               <div className="flex items-center justify-between p-4 border-b border-slate-200">
@@ -448,8 +449,10 @@ const Navbar = () => {
               </nav>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
+
     </header>
   );
 };

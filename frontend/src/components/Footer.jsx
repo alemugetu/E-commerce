@@ -19,10 +19,10 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-slate-900 text-slate-200 pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-          
+    <footer className="bg-slate-900 text-slate-200 pt-10 pb-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-4">
+
           {/* Company Information */}
           <div className="lg:col-span-1">
             <Link to="/" className="text-2xl font-bold text-white mb-4 inline-block">
@@ -96,13 +96,12 @@ const Footer = () => {
               <button
                 type="submit"
                 disabled={status === 'loading' || status === 'success'}
-                className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
-                  status === 'success'
-                    ? 'bg-emerald-700 text-white cursor-default'
-                    : status === 'loading'
+                className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${status === 'success'
+                  ? 'bg-emerald-700 text-white cursor-default'
+                  : status === 'loading'
                     ? 'bg-emerald-600/70 text-white cursor-wait'
                     : 'bg-emerald-600 text-white hover:bg-emerald-700 hover:-translate-y-0.5 shadow-sm'
-                }`}
+                  }`}
               >
                 {status === 'loading' ? (
                   <span className="animate-pulse">Subscribing...</span>
@@ -120,7 +119,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
+        <div className="border-t border-slate-800 pt-4 text-center text-sm text-slate-500">
           <p>&copy; {new Date().getFullYear()} STORE.ET. All rights reserved.</p>
         </div>
       </div>
