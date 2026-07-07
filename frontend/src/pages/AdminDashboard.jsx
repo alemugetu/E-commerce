@@ -775,6 +775,336 @@ const CustomersTab = () => {
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
+// TAB 6 — Store Settings (superuser-only company info & social media management)
+// ══════════════════════════════════════════════════════════════════════════════
+const INITIAL_SETTINGS_FORM = {
+  company_name: '',
+  company_description: '',
+  company_email: '',
+  company_phone: '',
+  company_address: '',
+  facebook_url: '',
+  instagram_url: '',
+  linkedin_url: '',
+  tiktok_url: '',
+  telegram_url: '',
+  whatsapp_url: '',
+  youtube_url: '',
+  x_url: '',
+  footer_description: '',
+  copyright_text: '',
+  meta_title: '',
+  meta_description: '',
+};
+
+const StoreSettingsTab = () => {
+  const { user } = useAuth();
+  const [form, setForm] = useState(INITIAL_SETTINGS_FORM);
+  const [logoFile, setLogoFile] = useState(null);
+  const [faviconFile, setFaviconFile] = useState(null);
+  const [currentLogoUrl, setCurrentLogoUrl] = useState(null);
+  const [currentFaviconUrl, setCurrentFaviconUrl] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Fetch current settings on mount
+  const loadSettings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.get('/site_settings/store/settings/');
+      // Populate form with fetched values (replace null with empty string for inputs)
+      const normalized = Object.fromEntries(
+        Object.entries(INITIAL_SETTINGS_FORM).map(([k]) => [k, data[k] ?? ''])
+      );
+      setForm(normalized);
+      // Store media URLs separately for preview (already absolute from serializer)
+      if (data.company_logo) setCurrentLogoUrl(data.company_logo);
+      if (data.favicon)      setCurrentFaviconUrl(data.favicon);
+    } catch {
+      toast.error('Failed to load store settings.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadSettings(); }, [loadSettings]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user?.is_superuser) {
+      toast.error('Only superusers can update store settings.');
+      return;
+    }
+    setSaving(true);
+    try {
+      // Use FormData to support optional file uploads alongside text fields
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => {
+        if (v !== '') fd.append(k, v);
+      });
+      if (logoFile)    fd.append('company_logo', logoFile);
+      if (faviconFile) fd.append('favicon', faviconFile);
+
+      // PATCH the singleton — pk=1 is enforced by the backend
+      await api.patch('/site_settings/store/settings/', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      toast.success('Store settings saved successfully.');
+      setLogoFile(null);
+      setFaviconFile(null);
+      await loadSettings(); // Refresh to pick up new media URLs
+    } catch (err) {
+      const msg = err.response?.data
+        ? Object.values(err.response.data).flat().join(' ')
+        : 'Failed to save settings.';
+      toast.error(msg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!user?.is_superuser) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-400">Configuration</p>
+          <h2 className="mt-1 text-2xl font-black text-slate-100">Store Settings</h2>
+        </div>
+        <div className="rounded-2xl border border-amber-800/40 bg-amber-900/20 p-6 text-sm text-amber-300">
+          <p className="font-bold mb-1">⚠ Superuser Access Required</p>
+          <p className="text-amber-400/80">Only superusers can manage store settings.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-400">Configuration</p>
+        <h2 className="mt-1 text-2xl font-black text-slate-100">Store Settings</h2>
+        <p className="mt-1 text-sm text-slate-400">
+          Manage company information, social media links, and branding. Changes reflect immediately
+          across the public-facing site.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="space-y-4 animate-pulse">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-12 rounded-xl bg-slate-800/60" />
+          ))}
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+          {/* ── Company Information ───────────────────────────────────── */}
+          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+            <h3 className="text-base font-bold text-slate-100 mb-4">Company Information</h3>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className={labelCls}>Company Name</label>
+                <input
+                  type="text"
+                  name="company_name"
+                  value={form.company_name}
+                  onChange={handleChange}
+                  className={inputCls}
+                  placeholder="Your company name"
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Company Email</label>
+                <input
+                  type="email"
+                  name="company_email"
+                  value={form.company_email}
+                  onChange={handleChange}
+                  className={inputCls}
+                  placeholder="contact@example.com"
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Phone Number</label>
+                <input
+                  type="text"
+                  name="company_phone"
+                  value={form.company_phone}
+                  onChange={handleChange}
+                  className={inputCls}
+                  placeholder="+251 900 000 000"
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Address</label>
+                <input
+                  type="text"
+                  name="company_address"
+                  value={form.company_address}
+                  onChange={handleChange}
+                  className={inputCls}
+                  placeholder="City, Country"
+                />
+              </div>
+            </div>
+            <div className="mt-4">
+              <label className={labelCls}>Company Description</label>
+              <textarea
+                name="company_description"
+                value={form.company_description}
+                onChange={handleChange}
+                rows={3}
+                className={inputCls + ' resize-none'}
+                placeholder="Short description shown in the hero section"
+              />
+            </div>
+          </section>
+
+          {/* ── Branding / Logo ───────────────────────────────────────── */}
+          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+            <h3 className="text-base font-bold text-slate-100 mb-4">Branding</h3>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <label className={labelCls}>Company Logo</label>
+                {currentLogoUrl && (
+                  <img
+                    src={currentLogoUrl}
+                    alt="Current logo"
+                    className="mb-2 h-12 w-auto object-contain rounded bg-slate-800 p-1"
+                  />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)}
+                  className="block w-full text-xs text-slate-400 file:mr-3 file:rounded-full file:border-0 file:bg-indigo-600/20 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-indigo-300 hover:file:bg-indigo-600/30 cursor-pointer"
+                />
+                <p className="mt-1 text-[10px] text-slate-500">Leave blank to keep the current logo.</p>
+              </div>
+              <div>
+                <label className={labelCls}>Favicon</label>
+                {currentFaviconUrl && (
+                  <img
+                    src={currentFaviconUrl}
+                    alt="Current favicon"
+                    className="mb-2 h-8 w-8 object-contain rounded bg-slate-800 p-1"
+                  />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFaviconFile(e.target.files?.[0] ?? null)}
+                  className="block w-full text-xs text-slate-400 file:mr-3 file:rounded-full file:border-0 file:bg-indigo-600/20 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-indigo-300 hover:file:bg-indigo-600/30 cursor-pointer"
+                />
+                <p className="mt-1 text-[10px] text-slate-500">Leave blank to keep the current favicon.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* ── Social Media URLs ─────────────────────────────────────── */}
+          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+            <h3 className="text-base font-bold text-slate-100 mb-1">Social Media</h3>
+            <p className="text-xs text-slate-400 mb-4">
+              Enter the full URL. Leave blank to hide that icon on the public site.
+            </p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {[
+                { name: 'facebook_url',  placeholder: 'https://facebook.com/yourpage',   label: 'Facebook'  },
+                { name: 'instagram_url', placeholder: 'https://instagram.com/yourhandle', label: 'Instagram' },
+                { name: 'linkedin_url',  placeholder: 'https://linkedin.com/company/...',  label: 'LinkedIn'  },
+                { name: 'tiktok_url',    placeholder: 'https://tiktok.com/@yourhandle',    label: 'TikTok'    },
+                { name: 'telegram_url',  placeholder: 'https://t.me/yourchannel',           label: 'Telegram'  },
+                { name: 'whatsapp_url',  placeholder: 'https://wa.me/2519XXXXXXXX',         label: 'WhatsApp'  },
+                { name: 'youtube_url',   placeholder: 'https://youtube.com/@yourchannel',  label: 'YouTube'   },
+                { name: 'x_url',         placeholder: 'https://x.com/yourhandle',           label: 'X (Twitter)' },
+              ].map(({ name, placeholder, label }) => (
+                <div key={name}>
+                  <label className={labelCls}>{label}</label>
+                  <input
+                    type="url"
+                    name={name}
+                    value={form[name]}
+                    onChange={handleChange}
+                    className={inputCls}
+                    placeholder={placeholder}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* ── Footer & SEO ──────────────────────────────────────────── */}
+          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+            <h3 className="text-base font-bold text-slate-100 mb-4">Footer &amp; SEO</h3>
+            <div className="space-y-4">
+              <div>
+                <label className={labelCls}>Footer Description</label>
+                <textarea
+                  name="footer_description"
+                  value={form.footer_description}
+                  onChange={handleChange}
+                  rows={2}
+                  className={inputCls + ' resize-none'}
+                  placeholder="Short tagline shown in the footer (falls back to company description)"
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Copyright Text</label>
+                <input
+                  type="text"
+                  name="copyright_text"
+                  value={form.copyright_text}
+                  onChange={handleChange}
+                  className={inputCls}
+                  placeholder="© 2025 STORE.ET. All rights reserved."
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className={labelCls}>Meta Title (SEO)</label>
+                  <input
+                    type="text"
+                    name="meta_title"
+                    value={form.meta_title}
+                    onChange={handleChange}
+                    className={inputCls}
+                    placeholder="Page title for search engines"
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Meta Description (SEO)</label>
+                  <input
+                    type="text"
+                    name="meta_description"
+                    value={form.meta_description}
+                    onChange={handleChange}
+                    className={inputCls}
+                    placeholder="Short summary for search results"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <button
+            type="submit"
+            disabled={saving}
+            className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {saving ? 'Saving…' : 'Save Store Settings'}
+          </button>
+        </form>
+      )}
+    </div>
+  );
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
 // ROOT — reads activeTab from AdminLayout context and renders exactly one tab
 // ══════════════════════════════════════════════════════════════════════════════
 const AdminDashboard = () => {
@@ -782,11 +1112,12 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-full">
-      {activeTab === 'overview' && <OverviewTab />}
-      {activeTab === 'products' && <ProductsTab />}
-      {activeTab === 'orders' && <OrdersTab />}
-      {activeTab === 'customers' && <CustomersTab />}
-      {activeTab === 'admin-users' && <AdminUsersTab />}
+      {activeTab === 'overview'       && <OverviewTab />}
+      {activeTab === 'products'       && <ProductsTab />}
+      {activeTab === 'orders'         && <OrdersTab />}
+      {activeTab === 'customers'      && <CustomersTab />}
+      {activeTab === 'admin-users'    && <AdminUsersTab />}
+      {activeTab === 'store-settings' && <StoreSettingsTab />}
     </div>
   );
 };

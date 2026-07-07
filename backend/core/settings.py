@@ -76,7 +76,8 @@ INSTALLED_APPS = [
     'products',
     'apps_products',
     'payments',
-    'custom_admin'
+    'custom_admin',
+    'site_settings',
 ]
 
 MIDDLEWARE = [

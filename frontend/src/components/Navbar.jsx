@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useStoreSettingsContext } from '../context/StoreSettingsContext';
 import { getInitials } from '../utils/getInitials';
 import { createPortal } from 'react-dom';
 
@@ -13,6 +14,11 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const { wishlistCount } = useWishlist();
   const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification } = useNotifications();
+  // Pull dynamic store info — falls back gracefully while loading
+  const { settings } = useStoreSettingsContext();
+  const storeName = settings?.company_name || 'STORE.ET';
+  // company_logo is returned as an absolute URL by the backend serializer
+  const logoUrl = settings?.company_logo || null;
 
   // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -50,9 +56,19 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
-          {/* Brand */}
-          <Link to="/" className="flex-shrink-0">
-            <span className="text-2xl font-bold text-emerald-600 tracking-tight">STORE.ET</span>
+          {/* Brand — logo image if configured, otherwise text fallback */}
+          <Link to="/" className="flex-shrink-0 flex items-center gap-2">
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={storeName}
+                className="h-8 w-auto object-contain"
+              />
+            ) : (
+              <span className="text-2xl font-bold text-emerald-600 tracking-tight">
+                {storeName}
+              </span>
+            )}
           </Link>
 
           {/* Desktop Navigation */}
@@ -328,7 +344,7 @@ const Navbar = () => {
             <div className="flex flex-col h-full">
               {/* Drawer Header */}
               <div className="flex items-center justify-between p-4 border-b border-slate-200">
-                <span className="text-lg font-bold text-emerald-600">Menu</span>
+                <span className="text-lg font-bold text-emerald-600">{storeName}</span>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2 text-slate-600 hover:text-emerald-600 transition-colors"

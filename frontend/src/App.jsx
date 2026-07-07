@@ -10,6 +10,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { StoreSettingsProvider } from './context/StoreSettingsContext';
 
 // Layout Shell Imports
 import PublicLayout from './layouts/PublicLayout';
@@ -142,7 +143,9 @@ function App() {
           <WishlistProvider>
             <NotificationProvider>
               <BrowserRouter>
-                <AppRouter />
+                <StoreSettingsProvider>
+                  <AppRouter />
+                </StoreSettingsProvider>
               </BrowserRouter>
             </NotificationProvider>
           </WishlistProvider>

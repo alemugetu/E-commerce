@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/payments/', include('payments.urls')),
     #For admin dashboard control endpoints
     path('api/custom-admin/', include('custom_admin.urls')),
+    path('api/site_settings/', include('site_settings.urls')),
 ]
 
 if settings.DEBUG:

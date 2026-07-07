@@ -4,6 +4,7 @@ import { HiShoppingBag, HiArrowRight, HiArrowTopRightOnSquare } from 'react-icon
 import { useCategories } from '../hooks/useCategories';
 import { getCategoryIcon } from '../utils/categoryIcons';
 import Card from '../components/ui/Card';
+import { useStoreSettingsContext } from '../context/StoreSettingsContext';
 
 const CategorySkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -20,6 +21,12 @@ const CategorySkeleton = () => (
 
 const Home = () => {
   const { data: categories = [], isLoading, isError, error } = useCategories();
+  // Pull dynamic store identity — falls back to safe defaults while loading
+  const { settings } = useStoreSettingsContext();
+  const storeName = settings?.company_name || 'STORE.ET';
+  const storeDescription =
+    settings?.company_description ||
+    "Ethiopia's trusted marketplace for quality products — curated selection, fair prices, and delivery you can rely on.";
 
   return (
     <div className="pb-12">
@@ -46,11 +53,10 @@ const Home = () => {
               id="hero-heading"
               className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight"
             >
-              STORE.ET
+              {storeName}
             </h1>
             <p className="mt-5 text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-              Ethiopia&apos;s trusted marketplace for quality products — curated selection,
-              fair prices, and delivery you can rely on.
+              {storeDescription}
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center">
