@@ -25,9 +25,12 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // Admin user trying to access the customer dashboard → redirect to admin panel
-  if (user.is_staff || user.is_superuser) {
+  // Admin user trying to access the customer dashboard → redirect to correct dashboard
+  if (user.is_superuser) {
     return <Navigate to="/admin" replace />;
+  }
+  if (user.is_staff) {
+    return <Navigate to="/seller" replace />;
   }
 
   // Authenticated regular customer → render the requested component

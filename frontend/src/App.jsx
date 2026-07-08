@@ -7,6 +7,8 @@ import { Toaster } from 'react-hot-toast';
 // Auth State System Imports
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import SellerProtectedRoute from './components/auth/SellerProtectedRoute';
+import SuperuserProtectedRoute from './components/auth/SuperuserProtectedRoute';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -14,17 +16,14 @@ import { StoreSettingsProvider } from './context/StoreSettingsContext';
 
 // Layout Shell Imports
 import PublicLayout from './layouts/PublicLayout';
-import AdminLayout from './layouts/AdminLayout';
 import DashboardLayout from './layouts/DashboardLayout';
-import AdminProtectedRoute from './components/common/AdminProtectedRoute';
-
-
+import SellerLayout from './layouts/SellerLayout';
+import SuperuserLayout from './layouts/SuperuserLayout';
 
 // Page Component Imports
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import AdminDashboard from './pages/AdminDashboard';
 import CustomerDashboard from './pages/CustomerDashboard';
 import DashboardOrders from './pages/DashboardOrders';
 import DashboardAddress from './pages/DashboardAddress';
@@ -38,6 +37,21 @@ import Contact from './pages/Contact';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPasswordConfirm from './pages/ResetPasswordConfirm';
 import Products from './pages/Products';
+
+// Seller Dashboard Pages
+import SellerDashboard from './pages/seller/SellerDashboard';
+import SellerProducts from './pages/seller/SellerProducts';
+import SellerOrders from './pages/seller/SellerOrders';
+import SellerInventory from './pages/seller/SellerInventory';
+import SellerCustomers from './pages/seller/SellerCustomers';
+
+// Superuser Dashboard Pages (Phase 3)
+import SuperuserDashboard from './pages/superuser/SuperuserDashboard';
+import SuperuserUsers from './pages/superuser/SuperuserUsers';
+import SuperuserCategories from './pages/superuser/SuperuserCategories';
+import SuperuserSettings from './pages/superuser/SuperuserSettings';
+import SuperuserReports from './pages/superuser/SuperuserReports';
+import SuperuserAuditLog from './pages/superuser/SuperuserAuditLog';
 
 
 // 2. Instantiate a global QueryClient configuration block
@@ -100,10 +114,26 @@ const AppRouter = () => {
         <Route path="address" element={<DashboardAddress />} />
       </Route>
 
-      {/* Admin Routes — staff/superuser only */}
-      <Route path="/admin" element={<AdminProtectedRoute />}>
-        <Route element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
+      {/* Seller Dashboard Routes — Phase 2 */}
+      <Route path="/seller" element={<SellerProtectedRoute />}>
+        <Route element={<SellerLayout />}>
+          <Route index             element={<SellerDashboard />} />
+          <Route path="products"   element={<SellerProducts />} />
+          <Route path="orders"     element={<SellerOrders />} />
+          <Route path="inventory"  element={<SellerInventory />} />
+          <Route path="customers"  element={<SellerCustomers />} />
+        </Route>
+      </Route>
+
+      {/* Admin Routes — superuser only (Phase 3) */}
+      <Route path="/admin" element={<SuperuserProtectedRoute />}>
+        <Route element={<SuperuserLayout />}>
+          <Route index                element={<SuperuserDashboard />} />
+          <Route path="users"         element={<SuperuserUsers />} />
+          <Route path="categories"    element={<SuperuserCategories />} />
+          <Route path="settings"      element={<SuperuserSettings />} />
+          <Route path="reports"       element={<SuperuserReports />} />
+          <Route path="audit"         element={<SuperuserAuditLog />} />
         </Route>
       </Route>
 

@@ -16,6 +16,7 @@ from .services import fulfill_order_pipeline
 from chapa import Chapa  # type: ignore[import]
 import requests # type: ignore
 import uuid
+from apps_auth.permissions import IsSeller
 
 class CartAPIView(APIView):
     """
@@ -306,14 +307,11 @@ class UserOrderHistoryView(APIView):
 
 class AdminOrderListView(APIView):
     """
-    Retrieves all orders for admin/staff to view and manage.
+    Retrieves all orders for sellers and superusers to view and manage.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSeller]
 
     def get(self, request):
-        if not (request.user.is_staff or request.user.is_superuser):
-            return Response({"error": "Only staff and superusers can view all orders."}, status=status.HTTP_403_FORBIDDEN)
-
         orders = (
             Order.objects.all()
             .order_by('-created_at')
@@ -337,19 +335,16 @@ class AdminOrderListView(APIView):
 
 
 class OrderStatusUpdateView(APIView):
-    """Allow staff and superusers to update an order status."""
-    permission_classes = [IsAuthenticated]
+    """Allow sellers and superusers to update an order status."""
+    permission_classes = [IsSeller]
 
     def patch(self, request, pk):
-        if not (request.user.is_staff or request.user.is_superuser):
-            return Response({"error": "Only staff and superusers can update order status."}, status=status.HTTP_403_FORBIDDEN)
-
         order = get_object_or_404(Order, pk=pk)
         new_status = request.data.get('status', '').strip()
 
         if new_status not in dict(Order.STATUS_CHOICES):
             return Response({"error": "Invalid order status."}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         old_status = order.status
         order.status = new_status
         if new_status == 'Paid':
@@ -358,15 +353,33 @@ class OrderStatusUpdateView(APIView):
             order.is_paid = False
 
         order.save(update_fields=['status', 'is_paid', 'updated_at'])
-        
-        # Create notification only if status changed
+
+        # Create notification only if status actually changed
         if old_status != new_status:
             Notification.objects.create(
                 user=order.user,
                 order=order,
                 message=f"Order #{order.id} status updated to {new_status}"
             )
-        
+            # ── Audit log ────────────────────────────────────────────────────
+            try:
+                from custom_admin.models import AuditLog
+                AuditLog.log(
+                    actor=request.user,
+                    action='order_status_changed',
+                    target=f"Order #{order.id}",
+                    details={
+                        'order_id': order.id,
+                        'old_status': old_status,
+                        'new_status': new_status,
+                        'customer': order.user.email,
+                        'changed_by': request.user.email,
+                    },
+                    request=request,
+                )
+            except Exception:
+                pass  # Audit failure must never break the primary flow
+
         serializer = OrderSerializer(order, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 

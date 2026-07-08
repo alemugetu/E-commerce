@@ -4,37 +4,27 @@ from django_filters.rest_framework import DjangoFilterBackend # pyright: ignore[
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .models import Category, Product, ProductImage
 from .serializers import CategorySerializer, ProductSerializer, ProductImageSerializer
+from apps_auth.permissions import IsSeller, IsSuperuser
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """
-    A ViewSet that handles full CRUD logic for Categories.
-    - Anyone can read/list categories.
-    - Only administrative staff can create or modify them.
+    Anyone can read categories.
+    Superusers manage categories (create / update / delete).
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
     def get_permissions(self):
-        """
-        Dynamically applies restriction rules depending on the action type.
-        """
         if self.action in ['list', 'retrieve']:
-            permission_classes = [permissions.AllowAny]
-        else:
-            permission_classes = [permissions.IsAdminUser]
-        return [permission() for permission in permission_classes]
+            return [permissions.AllowAny()]
+        # Only superusers can mutate category structure
+        return [IsSuperuser()]
 
     def get_queryset(self):
-        """
-        Optimizes data queries. If listing top-level categories,
-        we only grab root items to avoid double rendering child nodes.
-        """
         queryset = super().get_queryset()
-
         if self.action == 'list':
             return queryset.filter(parent=None).prefetch_related('children')
-
         return queryset
 
 

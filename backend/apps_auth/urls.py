@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from apps_auth.views import RegisterView
-from .views import CustomerProfileDetailView, ForgotPasswordView, ConfirmPasswordResetView, CustomerApprovalManagementView
+from .views import CustomerProfileDetailView, ForgotPasswordView, ConfirmPasswordResetView, CustomerApprovalManagementView, UserPermissionsView
 from .serializers import CustomTokenObtainPairSerializer
 
 
@@ -27,6 +27,7 @@ urlpatterns = [
     # 3. Refresh Endpoint (Issue new Access Token using Refresh Token)
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('profile/', CustomerProfileDetailView.as_view(), name='customer-profile-detail'),
+    path('permissions/', UserPermissionsView.as_view(), name='user-permissions'),
     path('customers/', CustomerApprovalManagementView.as_view(), name='admin-customers-list'),
     path('customers/<int:pk>/', CustomerApprovalManagementView.as_view(), name='admin-customer-detail'),
     path('forgot-password/', ForgotPasswordView.as_view(), name='api-forgot-password'),

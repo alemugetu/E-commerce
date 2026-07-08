@@ -36,11 +36,39 @@ const decodeTokenToUser = (accessToken) => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [permissions, setPermissions] = useState([]);
+
+  // Fetch user permissions from backend
+  const fetchPermissions = useCallback(async () => {
+    try {
+      const { data } = await api.get('/auth/permissions/');
+      setPermissions(data.permissions || []);
+    } catch (e) {
+      // Silently ignore – missing auth will be handled elsewhere
+      setPermissions([]);
+    }
+  }, []);
+
+  // After we have a decoded user (post‑login or token refresh), load permissions
+  useEffect(() => {
+    if (user) {
+      fetchPermissions();
+    } else {
+      setPermissions([]);
+    }
+  }, [user, fetchPermissions]);
 
   // Keeps a ref so logout() can redirect without needing react-router hooks
   // (AuthContext sits above the Router in the tree)
   const navigateRef = useRef(null);
   const setNavigate = (fn) => { navigateRef.current = fn; };
+
+  // ------------------------------------------------------------------
+  // Derived role helpers for cleaner component logic
+  // ------------------------------------------------------------------
+  const isSeller = user?.is_staff && !user?.is_superuser;
+  const isSuperuser = user?.is_superuser === true;
+  const isCustomer = user && !user.is_staff && !user.is_superuser;
 
   // ------------------------------------------------------------------
   // Enrich the decoded token user with full name from the profile API.
@@ -149,7 +177,19 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refreshAuthToken, setNavigate }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      login, 
+      logout, 
+      refreshAuthToken, 
+      setNavigate,
+      permissions,
+      // Derived role flags for UI logic
+      isSeller,
+      isSuperuser,
+      isCustomer,
+    }}>
       {children}
     </AuthContext.Provider>
   );

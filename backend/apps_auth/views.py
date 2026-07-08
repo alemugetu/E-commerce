@@ -4,20 +4,33 @@ from rest_framework import status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 import logging
-from rest_framework.permissions import IsAuthenticated
-from .serializers import UserProfileSerializer
-from .models import CustomUser
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_bytes, force_str
+from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
-from rest_framework.permissions import AllowAny
 from django.db.models import Q
+
+from .serializers import UserProfileSerializer
+from .models import CustomUser
+from .permissions import IsSeller
 
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
+
+
+def _get_audit_log():
+    """
+    Lazy import to avoid circular dependency between apps_auth and custom_admin.
+    Returns the AuditLog class or None if unavailable.
+    """
+    try:
+        from custom_admin.models import AuditLog
+        return AuditLog
+    except ImportError:
+        return None
 
 class RegisterView(APIView):
     """
@@ -108,7 +121,11 @@ class RegisterView(APIView):
         
 
 class CustomerApprovalManagementView(APIView):
-    permission_classes = [IsAuthenticated]
+    """
+    Seller-level endpoint for reviewing and approving/rejecting customer accounts.
+    Superusers inherit this capability via the IsSeller permission class.
+    """
+    permission_classes = [IsSeller]
 
     def _serialize_customer(self, user):
         return {
@@ -122,10 +139,10 @@ class CustomerApprovalManagementView(APIView):
         }
 
     def get(self, request):
-        if not (request.user.is_staff or request.user.is_superuser):
-            return Response({'error': 'Only staff can manage customer approvals.'}, status=status.HTTP_403_FORBIDDEN)
+        customers = User.objects.filter(
+            Q(is_staff=False) & Q(is_superuser=False)
+        ).order_by('-created_at')
 
-        customers = User.objects.filter(Q(is_staff=False) & Q(is_superuser=False)).order_by('-created_at')
         return Response({
             'results': [self._serialize_customer(customer) for customer in customers],
             'summary': {
@@ -137,9 +154,6 @@ class CustomerApprovalManagementView(APIView):
         }, status=status.HTTP_200_OK)
 
     def patch(self, request, pk):
-        if not (request.user.is_staff or request.user.is_superuser):
-            return Response({'error': 'Only staff can manage customer approvals.'}, status=status.HTTP_403_FORBIDDEN)
-
         try:
             customer = User.objects.get(pk=pk, is_staff=False, is_superuser=False)
         except User.DoesNotExist:
@@ -149,9 +163,27 @@ class CustomerApprovalManagementView(APIView):
         if new_status not in dict(User.APPROVAL_CHOICES):
             return Response({'error': 'Invalid approval status.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        old_status = customer.approval_status
         customer.approval_status = new_status
-        customer.is_active = new_status == 'approved'
+        customer.is_active = (new_status == 'approved')
         customer.save()
+
+        # ── Audit log ────────────────────────────────────────────────────────
+        AuditLog = _get_audit_log()
+        if AuditLog:
+            action = 'customer_approved' if new_status == 'approved' else 'customer_rejected'
+            AuditLog.log(
+                actor=request.user,
+                action=action,
+                target=customer.email,
+                details={
+                    'old_status': old_status,
+                    'new_status': new_status,
+                    'changed_by': request.user.email,
+                },
+                request=request,
+            )
+
         return Response(self._serialize_customer(customer), status=status.HTTP_200_OK)
 
 
@@ -250,3 +282,18 @@ class ConfirmPasswordResetView(APIView):
         return Response({"message": "Your password has been reset successfully. You may now log in."}, status=status.HTTP_200_OK)
     
         
+
+class UserPermissionsView(APIView):
+    """Return a list of permission codenames the authenticated user possesses.
+
+    Used by the frontend to build permission‑driven navigation.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"permissions": []}, status=status.HTTP_200_OK)
+        # Django returns strings like "app_label.codename"
+        perms = request.user.get_all_permissions()
+        codename_list = [p.split('.')[-1] for p in perms]
+        return Response({"permissions": codename_list}, status=status.HTTP_200_OK)

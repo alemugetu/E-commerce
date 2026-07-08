@@ -23,16 +23,20 @@ const Login = () => {
 
   /**
    * Determines the correct post-login destination based on role.
-   *  - Admin (is_staff or is_superuser) → /admin
-   *  - Everyone else                    → /dashboard (or their intended page)
+   *  - Superuser (is_superuser)       → /admin
+   *  - Seller (is_staff, not superuser) → /seller
+   *  - Customer                       → /dashboard (or their intended page)
    */
   const getRedirectPath = (loggedInUser) => {
-    if (loggedInUser?.is_staff || loggedInUser?.is_superuser) {
+    if (loggedInUser?.is_superuser) {
       return '/admin';
     }
+    if (loggedInUser?.is_staff) {
+      return '/seller';
+    }
     // If the user was bounced from a customer-only page, send them back there.
-    // But never send a regular user to /admin even if that was the "from" path.
-    if (from && !from.startsWith('/admin')) {
+    // But never send a regular user to /admin or /seller even if that was the "from" path.
+    if (from && !from.startsWith('/admin') && !from.startsWith('/seller')) {
       return from;
     }
     return '/dashboard';

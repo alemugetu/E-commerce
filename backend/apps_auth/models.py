@@ -72,5 +72,20 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
     
+    @property
+    def is_seller(self):
+        """
+        Marketing-friendly property that returns True when the user is a seller
+        (is_staff=True) but NOT a superuser.
+        
+        This allows the UI to display "Seller" instead of "Staff" without
+        requiring a database schema change or migration.
+        
+        Usage:
+            if user.is_seller:
+                redirect_to_seller_dashboard()
+        """
+        return self.is_staff and not self.is_superuser
+    
     
     
