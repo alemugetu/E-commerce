@@ -7,12 +7,12 @@ import { AdminTabContext } from '../context/AdminTabContext';
 export { AdminTabContext, useAdminTab } from '../context/AdminTabContext';
 
 const NAV_ITEMS = [
-  { tab: 'overview',       label: 'Dashboard Overview', icon: '▣' },
-  { tab: 'products',       label: 'Products',            icon: '⬡' },
-  { tab: 'orders',         label: 'Orders',              icon: '◇' },
-  { tab: 'customers',      label: 'Customers',           icon: '◫' },
-  { tab: 'admin-users',    label: 'Admin Users',         icon: '⊕' },
-  { tab: 'store-settings', label: 'Store Settings',      icon: '⚙' },
+  { tab: 'overview', label: 'Dashboard Overview', icon: '▣' },
+  { tab: 'products', label: 'Products', icon: '⬡' },
+  { tab: 'orders', label: 'Orders', icon: '◇' },
+  { tab: 'customers', label: 'Customers', icon: '◫' },
+  { tab: 'admin-users', label: 'Admin Users', icon: '⊕' },
+  { tab: 'store-settings', label: 'Store Settings', icon: '⚙' },
 ];
 
 const AdminLayout = () => {

@@ -89,8 +89,9 @@ const DashboardShell = ({
 
   const isActive = (itemPath) => {
     if (itemPath === location.pathname) return true;
-    // Match child routes (e.g., /seller/products matches /seller/products/123)
-    if (location.pathname.startsWith(itemPath) && itemPath !== '/') return true;
+    // Match child routes (e.g., /seller/products/123 is active for /seller/products)
+    // but ensure the segment boundary is respected so /seller does NOT match /seller/products
+    if (itemPath !== '/' && location.pathname.startsWith(itemPath + '/')) return true;
     return false;
   };
 
@@ -158,7 +159,16 @@ const DashboardShell = ({
               Navigation
             </p>
             {navConfig.filter(item => {
+              // Superusers always see everything
               if (user?.is_superuser) return true;
+
+              // Sellers (is_staff=True, is_superuser=False) see all seller nav items.
+              // Access at the page level is already enforced by SellerProtectedRoute;
+              // hiding nav links from a seller who lacks a specific Django group
+              // assignment only degrades UX without adding security.
+              if (user?.is_staff && !user?.is_superuser) return true;
+
+              // For customer-role users, respect any requiredPermissions gates
               if (item.requiredPermissions && item.requiredPermissions.length > 0) {
                 return item.requiredPermissions.every(p => permissions.includes(p));
               }
