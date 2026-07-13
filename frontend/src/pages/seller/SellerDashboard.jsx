@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { MetricCard, LoadingSkeleton } from '../../components/shared';
+import { Tag, Package, DollarSign, ShoppingCart, Plus, ClipboardList, Users } from 'lucide-react';
 
 /**
  * SellerDashboard — Overview page for /seller
@@ -44,14 +45,14 @@ const SellerDashboard = () => {
       value: metrics?.total_products ?? '—',
       subtitle: `${metrics?.available_products ?? 0} live in store`,
       tone: 'from-emerald-500 to-teal-600',
-      icon: '🏷️',
+      icon: Tag,
     },
     {
       label: 'Out of Stock',
       value: metrics?.out_of_stock_products ?? '—',
       subtitle: `${metrics?.total_inventory_units ?? 0} total units`,
-      tone: 'from-amber-500 to-orange-600',
-      icon: '📦',
+      tone: 'from-amber-500 to-orange-500',
+      icon: Package,
     },
     {
       label: 'Total Revenue',
@@ -60,22 +61,22 @@ const SellerDashboard = () => {
         : '—',
       subtitle: `${metrics?.paid_orders ?? 0} paid orders`,
       tone: 'from-indigo-500 to-indigo-700',
-      icon: '💰',
+      icon: DollarSign,
     },
     {
       label: 'Pending Orders',
       value: metrics?.pending_orders ?? '—',
       subtitle: `${metrics?.processing_orders ?? 0} processing`,
       tone: 'from-slate-600 to-slate-800',
-      icon: '🛒',
+      icon: ShoppingCart,
     },
   ];
 
   const quickActions = [
-    { label: 'Add New Product',    to: '/seller/products',  color: 'bg-emerald-600 hover:bg-emerald-500', icon: '➕' },
-    { label: 'Manage Orders',      to: '/seller/orders',    color: 'bg-indigo-600  hover:bg-indigo-500',  icon: '📋' },
-    { label: 'Check Inventory',    to: '/seller/inventory', color: 'bg-amber-600   hover:bg-amber-500',   icon: '📦' },
-    { label: 'Review Customers',   to: '/seller/customers', color: 'bg-slate-700   hover:bg-slate-600',   icon: '👥' },
+    { label: 'Add New Product',    to: '/seller/products',  color: 'bg-emerald-600 hover:bg-emerald-500', icon: Plus },
+    { label: 'Manage Orders',      to: '/seller/orders',    color: 'bg-indigo-600  hover:bg-indigo-500',  icon: ClipboardList },
+    { label: 'Check Inventory',    to: '/seller/inventory', color: 'bg-amber-600   hover:bg-amber-500',   icon: Package },
+    { label: 'Review Customers',   to: '/seller/customers', color: 'bg-slate-700   hover:bg-slate-600',   icon: Users },
   ];
 
   return (
@@ -132,7 +133,7 @@ const SellerDashboard = () => {
               to={action.to}
               className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-white transition ${action.color}`}
             >
-              <span>{action.icon}</span>
+              <action.icon className="w-5 h-5" />
               <span>{action.label}</span>
             </Link>
           ))}

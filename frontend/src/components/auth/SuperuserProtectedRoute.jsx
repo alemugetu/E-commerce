@@ -9,7 +9,7 @@ import { useAuth } from '../../context/AuthContext';
  *   loading          → show spinner (prevents flash-redirect on page refresh)
  *   not logged in    → redirect to /login
  *   is_superuser     → grant access
- *   is_staff only    → redirect to /seller (sellers have their own dashboard)
+ *   other groups     → redirect to their group-specific dashboard
  *   regular customer → redirect to /dashboard
  * 
  * This replaces AdminProtectedRoute which allowed both staff AND superusers
@@ -19,7 +19,7 @@ import { useAuth } from '../../context/AuthContext';
  * new routes should use this component.
  */
 const SuperuserProtectedRoute = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, getDashboardRoute } = useAuth();
   const location = useLocation();
 
   // Wait for session restoration before making routing decisions
@@ -37,14 +37,11 @@ const SuperuserProtectedRoute = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Sellers get redirected to their own dashboard
-  if (user.is_staff && !user.is_superuser) {
-    return <Navigate to="/seller" replace />;
-  }
-
   // Must be a superuser
   if (!user.is_superuser) {
-    return <Navigate to="/dashboard" replace />;
+    // Redirect to the user's correct dashboard based on their groups
+    const dashboardRoute = getDashboardRoute();
+    return <Navigate to={dashboardRoute || '/dashboard'} replace />;
   }
 
   return <Outlet />;

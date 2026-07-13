@@ -74,6 +74,13 @@ const DashboardShell = ({
       hoverBg: 'hover:bg-slate-800/60 hover:text-slate-100',
       borderColor: 'border-slate-800',
     },
+    operations: {
+      sidebarBg: 'bg-slate-900',
+      brandColor: 'text-amber-400',
+      activeBg: 'bg-amber-600/20 text-amber-300 border-amber-600/30',
+      hoverBg: 'hover:bg-slate-800/60 hover:text-slate-100',
+      borderColor: 'border-slate-800',
+    },
     superuser: {
       sidebarBg: 'bg-slate-900',
       brandColor: 'text-purple-400',
@@ -141,7 +148,8 @@ const DashboardShell = ({
                   )}
                   <span className={`mt-1 inline-block rounded-full border px-2 py-0.5 text-[9px] font-bold ${theme.brandColor} border-opacity-50`}>
                     {dashboardType === 'superuser' ? 'Superuser' : 
-                     dashboardType === 'seller' ? 'Seller' : 'Customer'}
+                     dashboardType === 'seller' ? 'Seller' :
+                     dashboardType === 'operations' ? 'Operations' : 'Customer'}
                   </span>
                 </>
               ) : (
@@ -162,13 +170,8 @@ const DashboardShell = ({
               // Superusers always see everything
               if (user?.is_superuser) return true;
 
-              // Sellers (is_staff=True, is_superuser=False) see all seller nav items.
-              // Access at the page level is already enforced by SellerProtectedRoute;
-              // hiding nav links from a seller who lacks a specific Django group
-              // assignment only degrades UX without adding security.
-              if (user?.is_staff && !user?.is_superuser) return true;
-
-              // For customer-role users, respect any requiredPermissions gates
+              // Permission-based filtering for all users
+              // This replaces the old is_staff check with proper permission-based access
               if (item.requiredPermissions && item.requiredPermissions.length > 0) {
                 return item.requiredPermissions.every(p => permissions.includes(p));
               }
@@ -186,7 +189,7 @@ const DashboardShell = ({
                     ${active ? theme.activeBg : `text-slate-400 ${theme.hoverBg} border-transparent`}
                   `}
                 >
-                  {item.icon && <span className="text-base opacity-70">{item.icon}</span>}
+                  {item.icon && <item.icon className="w-5 h-5 opacity-70" />}
                   <span className="flex-1">{item.label}</span>
                   {item.badge && (
                     <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">

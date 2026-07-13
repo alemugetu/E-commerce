@@ -3,6 +3,7 @@ import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { DataTable, StatusBadge, ConfirmModal } from '../../components/shared';
 import toast from 'react-hot-toast';
+import { Edit, Plus, X } from 'lucide-react';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 const EMPTY_FORM = {
@@ -280,8 +281,18 @@ const SellerProducts = () => {
         <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 h-fit">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-base font-bold text-slate-100">
-                {editingId ? '✏️ Edit Product' : '➕ New Product'}
+              <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
+                {editingId ? (
+                  <>
+                    <Edit className="w-4 h-4" />
+                    Edit Product
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4" />
+                    New Product
+                  </>
+                )}
               </h2>
               {editingId && (
                 <p className="text-xs text-emerald-400 mt-0.5">ID #{editingId}</p>
@@ -290,9 +301,10 @@ const SellerProducts = () => {
             {editingId && (
               <button
                 onClick={handleCancelEdit}
-                className="text-xs text-slate-400 hover:text-slate-200 transition"
+                className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1"
               >
-                ✕ Cancel Edit
+                <X className="w-3 h-3" />
+                Cancel Edit
               </button>
             )}
           </div>

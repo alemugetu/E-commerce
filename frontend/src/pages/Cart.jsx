@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { initiateChapaCheckout } from '../services/paymentService'; // 2. Import service function
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import { ShoppingCart, AlertTriangle } from 'lucide-react';
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, cartTotal, cartCount } = useCart();
@@ -36,7 +37,7 @@ const Cart = () => {
   if (cartItems.length === 0) {
     return (
       <div className="max-w-md mx-auto px-4 py-24 text-center">
-        <div className="text-6xl mb-4">&#128722;</div>
+        <ShoppingCart className="w-20 h-20 mx-auto mb-4 text-indigo-500" />
         <h2 className="text-2xl font-bold text-slate-900">Your Cart is Empty</h2>
         <p className="text-slate-500 text-sm mt-2">Looks like you haven't added any hardware to your order yet.</p>
         <Button variant="primary" className="mt-6 w-full" onClick={() => navigate('/')}>
@@ -51,8 +52,9 @@ const Cart = () => {
       <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-8">Shopping Cart ({cartCount} items)</h1>
 
       {checkoutError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-medium">
-          ⚠️ {checkoutError}
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-medium flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4" />
+          {checkoutError}
         </div>
       )}
 

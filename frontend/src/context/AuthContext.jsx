@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { api, setLocalAccessToken } from '../services/api';
+import { getDashboardRouteForGroups, isInGroup } from '../config/groupRoutes';
 
 const AuthContext = createContext(null);
 
@@ -27,6 +28,8 @@ const decodeTokenToUser = (accessToken) => {
       // strings here and enriched after the profile fetch below.
       first_name: claims.first_name || '',
       last_name: claims.last_name || '',
+      // Decode user's Django groups from JWT for permission-driven routing
+      groups: claims.groups || [],
     };
   } catch {
     return null;
@@ -65,10 +68,11 @@ export const AuthProvider = ({ children }) => {
 
   // ------------------------------------------------------------------
   // Derived role helpers for cleaner component logic
+  // Now based on Django Groups instead of is_staff flags
   // ------------------------------------------------------------------
-  const isSeller = user?.is_staff && !user?.is_superuser;
+  const isSeller = isInGroup(user?.groups, 'Seller');
   const isSuperuser = user?.is_superuser === true;
-  const isCustomer = user && !user.is_staff && !user.is_superuser;
+  const isCustomer = user && !user.is_superuser && (!user.groups || user.groups.length === 0);
 
   // ------------------------------------------------------------------
   // Enrich the decoded token user with full name from the profile API.
@@ -85,6 +89,7 @@ export const AuthProvider = ({ children }) => {
         last_name: data.last_name || '',
         phone_number: data.phone_number || '',
         addresse: data.addresse || '',
+        // Make sure to preserve all baseUser properties like groups, is_staff, is_superuser!
       });
     } catch {
       // Profile fetch failing is non-fatal — keep the base decoded user
@@ -189,6 +194,8 @@ export const AuthProvider = ({ children }) => {
       isSeller,
       isSuperuser,
       isCustomer,
+      // Group-based routing helper
+      getDashboardRoute: () => getDashboardRouteForGroups(user?.groups || [], user?.is_superuser || false),
     }}>
       {children}
     </AuthContext.Provider>

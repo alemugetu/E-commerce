@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
+import { AlertTriangle } from 'lucide-react';
 
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 const FieldSkeleton = () => (
@@ -74,11 +75,11 @@ const CustomerDashboard = () => {
     }
   };
 
-  // ── Fetch error state ────────────────────────────────────────────────
+  // ── Fetch error state ────────────────────────────────────────────────────────
   if (fetchError) {
     return (
       <div className="text-center py-16">
-        <p className="text-3xl mb-3">⚠️</p>
+        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-amber-500" />
         <h3 className="text-lg font-bold text-slate-900">Could Not Load Profile</h3>
         <p className="text-sm text-slate-500 mt-1 mb-5">{fetchError}</p>
         <button

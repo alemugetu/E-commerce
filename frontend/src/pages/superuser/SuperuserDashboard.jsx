@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { MetricCard, LoadingSkeleton } from '../../components/shared';
+import { Tag, DollarSign, User, Building, Users, Folder, Settings, BarChart3, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 
 /**
  * SuperuserDashboard — Overview page for /admin
@@ -43,7 +44,7 @@ const SuperuserDashboard = () => {
       value: metrics?.total_products ?? '—',
       subtitle: `${metrics?.available_products ?? 0} available`,
       tone: 'from-purple-500 to-purple-700',
-      icon: '🏷️',
+      icon: Tag,
     },
     {
       label: 'Total Revenue',
@@ -52,29 +53,29 @@ const SuperuserDashboard = () => {
         : '—',
       subtitle: `${metrics?.paid_orders ?? 0} paid orders`,
       tone: 'from-emerald-500 to-teal-600',
-      icon: '💰',
+      icon: DollarSign,
     },
     {
       label: 'Total Customers',
       value: metrics?.total_customers ?? '—',
       subtitle: `${metrics?.pending_customers ?? 0} pending approval`,
       tone: 'from-indigo-500 to-indigo-700',
-      icon: '👤',
+      icon: User,
     },
     {
       label: 'Total Sellers',
       value: metrics?.total_sellers ?? '—',
       subtitle: `${metrics?.pending_orders ?? 0} pending orders`,
-      tone: 'from-amber-500 to-orange-600',
-      icon: '🏪',
+      tone: 'from-amber-500 to-orange-500',
+      icon: Building,
     },
   ];
 
   const quickActions = [
-    { label: 'User Management',  to: '/admin/users',      color: 'bg-purple-600 hover:bg-purple-500', icon: '👥' },
-    { label: 'Categories',       to: '/admin/categories', color: 'bg-indigo-600 hover:bg-indigo-500', icon: '📂' },
-    { label: 'Store Settings',   to: '/admin/settings',   color: 'bg-emerald-600 hover:bg-emerald-500', icon: '⚙️' },
-    { label: 'Reports',          to: '/admin/reports',    color: 'bg-amber-600 hover:bg-amber-500',   icon: '📊' },
+    { label: 'User Management',  to: '/admin/users',      color: 'bg-purple-600 hover:bg-purple-500', icon: Users },
+    { label: 'Categories',       to: '/admin/categories', color: 'bg-indigo-600 hover:bg-indigo-500', icon: Folder },
+    { label: 'Store Settings',   to: '/admin/settings',   color: 'bg-emerald-600 hover:bg-emerald-500', icon: Settings },
+    { label: 'Reports',          to: '/admin/reports',    color: 'bg-amber-600 hover:bg-amber-500',   icon: BarChart3 },
   ];
 
   return (
@@ -131,7 +132,7 @@ const SuperuserDashboard = () => {
               to={action.to}
               className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-white transition ${action.color}`}
             >
-              <span>{action.icon}</span>
+              <action.icon className="w-5 h-5" />
               <span>{action.label}</span>
             </Link>
           ))}
@@ -172,7 +173,7 @@ const SuperuserDashboard = () => {
           <div className="space-y-3">
             {metrics && metrics.pending_customers > 0 && (
               <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
-                <span className="text-amber-400 text-lg">⏳</span>
+                <Clock className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs font-bold text-amber-300">
                     {metrics.pending_customers} customer{metrics.pending_customers !== 1 ? 's' : ''} pending approval
@@ -185,7 +186,7 @@ const SuperuserDashboard = () => {
             )}
             {metrics && metrics.out_of_stock_products > 0 && (
               <div className="flex items-start gap-3 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3">
-                <span className="text-rose-400 text-lg">⚠️</span>
+                <AlertTriangle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs font-bold text-rose-300">
                     {metrics.out_of_stock_products} product{metrics.out_of_stock_products !== 1 ? 's' : ''} out of stock
@@ -198,7 +199,7 @@ const SuperuserDashboard = () => {
             )}
             {(!metrics || (metrics.pending_customers === 0 && metrics.out_of_stock_products === 0)) && (
               <div className="py-8 text-center">
-                <p className="text-4xl mb-2">✅</p>
+                <CheckCircle className="w-10 h-10 mx-auto mb-2 text-emerald-400" />
                 <p className="text-xs text-slate-500">All systems operational</p>
               </div>
             )}

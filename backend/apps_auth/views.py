@@ -297,3 +297,58 @@ class UserPermissionsView(APIView):
         perms = request.user.get_all_permissions()
         codename_list = [p.split('.')[-1] for p in perms]
         return Response({"permissions": codename_list}, status=status.HTTP_200_OK)
+
+
+class UserGroupsView(APIView):
+    """Return the authenticated user's Django groups and dashboard type information.
+
+    Used by the frontend for permission-driven dashboard routing.
+    Returns dashboard type instead of specific routes for better flexibility.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({
+                "groups": [], 
+                "primary_group": None, 
+                "dashboard_type": "unauthorized",
+                "is_superuser": False,
+                "is_staff": False,
+            }, status=status.HTTP_200_OK)
+        
+        # Get user's group names
+        group_names = list(request.user.groups.values_list('name', flat=True))
+        
+        # Define operational groups that should use the shared Operations Dashboard
+        OPERATIONAL_GROUPS = {
+            'Seller', 'Warehouse Manager', 'Finance Manager', 
+            'Marketing Manager', 'Customer Support', 
+            'Delivery Manager', 'Content Manager'
+        }
+        
+        # Determine dashboard type
+        dashboard_type = 'unauthorized'
+        
+        if request.user.is_superuser:
+            dashboard_type = 'superuser'
+        elif not group_names or group_names == []:
+            # No groups = regular customer
+            dashboard_type = 'customer'
+        elif any(group in OPERATIONAL_GROUPS for group in group_names):
+            # User belongs to operational groups
+            dashboard_type = 'operations'
+        else:
+            # Unknown groups - treat as unauthorized for now
+            dashboard_type = 'unauthorized'
+        
+        # Determine primary group (first group if multiple)
+        primary_group = group_names[0] if group_names else None
+        
+        return Response({
+            "groups": group_names,
+            "primary_group": primary_group,
+            "dashboard_type": dashboard_type,
+            "is_superuser": request.user.is_superuser,
+            "is_staff": request.user.is_staff,
+        }, status=status.HTTP_200_OK)

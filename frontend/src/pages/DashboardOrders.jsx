@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { fetchOrderHistory } from '../services/paymentService';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { AlertTriangle, Package } from 'lucide-react';
 
 // ─── Skeleton row ────────────────────────────────────────────────────────────
 const OrderSkeleton = () => (
@@ -110,7 +111,7 @@ const DashboardOrders = () => {
   if (error) {
     return (
       <div className="text-center py-16">
-        <p className="text-4xl mb-3">⚠️</p>
+        <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-amber-500" />
         <h3 className="text-lg font-bold text-slate-900">Failed to Load Orders</h3>
         <p className="text-sm text-slate-500 mt-1 mb-5">{error}</p>
         <button
@@ -127,7 +128,7 @@ const DashboardOrders = () => {
   if (orders.length === 0) {
     return (
       <div className="text-center py-20">
-        <p className="text-5xl mb-4">📦</p>
+        <Package className="w-16 h-16 mx-auto mb-4 text-indigo-500" />
         <h3 className="text-xl font-bold text-slate-900">No Orders Yet</h3>
         <p className="text-sm text-slate-500 mt-2">
           Once you complete a purchase, your order history will appear here.

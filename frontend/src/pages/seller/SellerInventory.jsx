@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../../services/api';
 import { DataTable, StatusBadge } from '../../components/shared';
 import toast from 'react-hot-toast';
+import { AlertTriangle } from 'lucide-react';
 
 /**
  * SellerInventory — Stock management for /seller/inventory
@@ -147,12 +148,12 @@ const SellerInventory = () => {
       {/* ── Out of Stock Alert ── */}
       {outOfStock > 0 && (
         <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 flex items-start gap-3">
-          <span className="text-rose-400 text-lg mt-0.5">⚠️</span>
+          <AlertTriangle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-bold text-rose-300">
               {outOfStock} product{outOfStock !== 1 ? 's' : ''} out of stock
             </p>
-            <p className="text-xs text-rose-400/80 mt-0.5">
+            <p className="text-[10px] text-rose-400/80 mt-1">
               Update stock levels below to prevent lost sales.
             </p>
           </div>

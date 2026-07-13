@@ -3,6 +3,7 @@ import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { DataTable, StatusBadge, ConfirmModal, MetricCard } from '../../components/shared';
 import toast from 'react-hot-toast';
+import { Users, Building, Key, Ban } from 'lucide-react';
 
 /**
  * SuperuserUsers — Seller & Superuser account management for /admin/users
@@ -224,10 +225,10 @@ const SuperuserUsers = () => {
       {/* ── Summary Cards ── */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { label: 'Total Members', value: summary?.total ?? 0,      tone: 'from-purple-500 to-purple-700', icon: '👥' },
-          { label: 'Sellers',       value: summary?.sellers ?? 0,    tone: 'from-emerald-500 to-teal-600',  icon: '🏪' },
-          { label: 'Superusers',    value: summary?.superusers ?? 0, tone: 'from-indigo-500 to-indigo-700', icon: '🔑' },
-          { label: 'Blocked',       value: summary?.inactive ?? 0,   tone: 'from-rose-500 to-rose-700',     icon: '🚫' },
+          { label: 'Total Members', value: summary?.total ?? 0,      tone: 'from-purple-500 to-purple-700', icon: Users },
+          { label: 'Sellers',       value: summary?.sellers ?? 0,    tone: 'from-emerald-500 to-teal-600',  icon: Building },
+          { label: 'Superusers',    value: summary?.superusers ?? 0, tone: 'from-indigo-500 to-indigo-700', icon: Key },
+          { label: 'Blocked',       value: summary?.inactive ?? 0,   tone: 'from-rose-500 to-rose-700',     icon: Ban },
         ].map(card => (
           <MetricCard
             key={card.label}

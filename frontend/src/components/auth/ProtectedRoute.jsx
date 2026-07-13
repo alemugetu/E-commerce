@@ -7,11 +7,12 @@ import { useAuth } from '../../context/AuthContext';
  *
  * Rules:
  *   - Not logged in       → redirect to /login (preserving intended destination)
- *   - Admin (is_staff or is_superuser) → redirect to /admin (wrong dashboard)
+ *   - User with groups    → redirect to their group-specific dashboard
+ *   - Superuser           → redirect to /admin
  *   - Regular customer    → render children normally
  */
 const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, getDashboardRoute } = useAuth();
   const location = useLocation();
 
   // No active session → send to login, remembering where they wanted to go
@@ -25,12 +26,10 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // Admin user trying to access the customer dashboard → redirect to correct dashboard
-  if (user.is_superuser) {
-    return <Navigate to="/admin" replace />;
-  }
-  if (user.is_staff) {
-    return <Navigate to="/seller" replace />;
+  // User with groups or superuser trying to access customer dashboard → redirect to correct dashboard
+  const dashboardRoute = getDashboardRoute();
+  if (dashboardRoute && dashboardRoute !== '/dashboard') {
+    return <Navigate to={dashboardRoute} replace />;
   }
 
   // Authenticated regular customer → render the requested component

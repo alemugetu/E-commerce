@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getDashboardRouteForGroups } from '../config/groupRoutes';
 
 // Import our custom atomic UI components
 import Card from '../components/ui/Card';
@@ -13,7 +14,7 @@ const Login = () => {
   const [localError, setLocalError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login, user } = useAuth();
+  const { login, user, getDashboardRoute } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,24 +23,26 @@ const Login = () => {
   const from = location.state?.from?.pathname;
 
   /**
-   * Determines the correct post-login destination based on role.
+   * Determines the correct post-login destination based on user's Django groups.
    *  - Superuser (is_superuser)       → /admin
-   *  - Seller (is_staff, not superuser) → /seller
-   *  - Customer                       → /dashboard (or their intended page)
+   *  - User with operational groups    → /operations (unified dashboard)
+   *  - Customer (no groups)           → /dashboard (or their intended page)
    */
   const getRedirectPath = (loggedInUser) => {
-    if (loggedInUser?.is_superuser) {
-      return '/admin';
-    }
-    if (loggedInUser?.is_staff) {
-      return '/seller';
-    }
+    // Use the new group-based routing with the fresh loggedInUser (not context's user which hasn't updated yet)
+    const dashboardRoute = getDashboardRouteForGroups(loggedInUser?.groups || [], loggedInUser?.is_superuser || false);
+    
     // If the user was bounced from a customer-only page, send them back there.
-    // But never send a regular user to /admin or /seller even if that was the "from" path.
-    if (from && !from.startsWith('/admin') && !from.startsWith('/seller')) {
+    // But never send a regular user to admin/seller/operations dashboards if that was the "from" path.
+    if (from && !from.startsWith('/admin') && !from.startsWith('/seller') && 
+        !from.startsWith('/operations') && !from.startsWith('/warehouse') && 
+        !from.startsWith('/finance') && !from.startsWith('/marketing') && 
+        !from.startsWith('/support') && !from.startsWith('/delivery') && 
+        !from.startsWith('/content')) {
       return from;
     }
-    return '/dashboard';
+    
+    return dashboardRoute || '/dashboard';
   };
 
   const handleSubmit = async (e) => {
@@ -58,15 +61,10 @@ const Login = () => {
     const result = await login(email, password);
 
     if (result.success) {
-      // After login, the AuthContext updates the `user` state asynchronously.
-      // We read the fresh user from the result if provided, otherwise fall back
-      // to decoding the token ourselves via the context.
-      // The login() function in AuthContext calls enrichUserFromProfile which
-      // sets user state — but since setState is async, we decode from result.
-      // We pass the decoded user stored in context after await completes.
-      // Small trick: read the updated context user via a brief state settle.
-      // Use result.user if your login() returns it, otherwise read from context.
-      navigate(getRedirectPath(result.user ?? user), { replace: true });
+      // Always use the freshly decoded user from the login response.
+      // The context user state updates asynchronously via setState, so we
+      // rely on result.user which contains the decoded groups immediately.
+      navigate(getRedirectPath(result.user), { replace: true });
     } else {
       setLocalError(result.error);
       setIsSubmitting(false);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../../services/api';
 import { DataTable, StatusBadge, ConfirmModal } from '../../components/shared';
 import toast from 'react-hot-toast';
+import { Edit, Plus, X } from 'lucide-react';
 
 /**
  * SuperuserCategories — Product category management for /admin/categories
@@ -200,15 +201,26 @@ const SuperuserCategories = () => {
         {/* ── Create / Edit Form ── */}
         <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 h-fit">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-slate-100">
-              {editingId ? '✏️ Edit Category' : '➕ New Category'}
+            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
+              {editingId ? (
+                <>
+                  <Edit className="w-4 h-4" />
+                  Edit Category
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" />
+                  New Category
+                </>
+              )}
             </h2>
             {editingId && (
               <button
                 onClick={handleCancelEdit}
-                className="text-xs text-slate-400 hover:text-slate-200"
+                className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1"
               >
-                ✕ Cancel
+                <X className="w-3 h-3" />
+                Cancel
               </button>
             )}
           </div>

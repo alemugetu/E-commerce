@@ -4,21 +4,19 @@ import { useAuth } from '../../context/AuthContext';
 import { canAccessOperationsDashboard, isInGroup } from '../../config/groupRoutes';
 
 /**
- * SellerProtectedRoute — Guards all routes under /seller (legacy routes)
- * 
- * This is now a legacy route for backward compatibility.
- * New operational users should use /operations routes instead.
+ * OperationsProtectedRoute — Guards all routes under /operations
  * 
  * Access rules:
  *   loading          → show spinner (prevents flash-redirect on page refresh)
  *   not logged in    → redirect to /login
  *   is_superuser     → redirect to /admin (superusers have their own dashboard)
- *   in Seller group  → grant access (legacy compatibility)
- *   other groups     → redirect to their group-specific dashboard
+ *   Seller           → redirect to /seller (Seller has standalone dashboard)
+ *   operational user → grant access to Operations Dashboard
  *   regular customer → redirect to /dashboard
+ *   unauthorized     → redirect to Access Denied page
  */
-const SellerProtectedRoute = () => {
-  const { user, loading, getDashboardRoute } = useAuth(); 
+const OperationsProtectedRoute = () => {
+  const { user, loading, getDashboardRoute } = useAuth();
   const location = useLocation();
 
   // Wait for session restoration before making routing decisions
@@ -26,7 +24,7 @@ const SellerProtectedRoute = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 gap-3">
         <div className="w-6 h-6 border-2 border-emerald-500/30 border-t-emerald-400 rounded-full animate-spin" />
-        <span className="text-sm text-slate-400 font-medium">Verifying seller access…</span>
+        <span className="text-sm text-slate-400 font-medium">Verifying access…</span>
       </div>
     );
   }
@@ -41,14 +39,25 @@ const SellerProtectedRoute = () => {
     return <Navigate to="/admin" replace />;
   }
 
-  // Must be in the Seller group for legacy /seller routes
-  if (!isInGroup(user.groups, 'Seller')) {
-    // Redirect to the user's correct dashboard based on their groups
+  // Seller has standalone dashboard - redirect away from Operations
+  if (isInGroup(user.groups, 'Seller')) {
+    return <Navigate to="/seller" replace />;
+  }
+
+  // Must be an operational user to access Operations Dashboard
+  if (!canAccessOperationsDashboard(user.groups, user.is_superuser)) {
+    // Redirect to the user's correct dashboard or Access Denied
     const dashboardRoute = getDashboardRoute();
-    return <Navigate to={dashboardRoute || '/dashboard'} replace />;
+    
+    // If user has no valid dashboard, show Access Denied page
+    if (!dashboardRoute || dashboardRoute === '/dashboard') {
+      return <Navigate to="/access-denied" replace />;
+    }
+    
+    return <Navigate to={dashboardRoute} replace />;
   }
 
   return <Outlet />;
 };
 
-export default SellerProtectedRoute;
+export default OperationsProtectedRoute;

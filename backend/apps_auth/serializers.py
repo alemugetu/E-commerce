@@ -14,6 +14,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['email'] = user.email
         token['approval_status'] = user.approval_status
         
+        # Inject user's Django groups for permission-driven routing
+        token['groups'] = list(user.groups.values_list('name', flat=True))
+        
         return token
 
     def validate(self, attrs):

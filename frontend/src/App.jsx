@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import SellerProtectedRoute from './components/auth/SellerProtectedRoute';
 import SuperuserProtectedRoute from './components/auth/SuperuserProtectedRoute';
+import OperationsProtectedRoute from './components/auth/OperationsProtectedRoute';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -18,12 +19,14 @@ import { StoreSettingsProvider } from './context/StoreSettingsContext';
 import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import SellerLayout from './layouts/SellerLayout';
+import OperationsLayout from './layouts/OperationsLayout';
 import SuperuserLayout from './layouts/SuperuserLayout';
 
 // Page Component Imports
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AccessDenied from './pages/AccessDenied';
 import CustomerDashboard from './pages/CustomerDashboard';
 import DashboardOrders from './pages/DashboardOrders';
 import DashboardAddress from './pages/DashboardAddress';
@@ -38,12 +41,24 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPasswordConfirm from './pages/ResetPasswordConfirm';
 import Products from './pages/Products';
 
-// Seller Dashboard Pages
+// Seller Dashboard Pages (legacy - being migrated to Operations)
 import SellerDashboard from './pages/seller/SellerDashboard';
 import SellerProducts from './pages/seller/SellerProducts';
 import SellerOrders from './pages/seller/SellerOrders';
 import SellerInventory from './pages/seller/SellerInventory';
 import SellerCustomers from './pages/seller/SellerCustomers';
+
+// Operations Dashboard Pages (new unified dashboard)
+import OperationsDashboard from './pages/operations/OperationsDashboard';
+import OperationsProducts from './pages/operations/OperationsProducts';
+import OperationsInventory from './pages/operations/OperationsInventory';
+import OperationsOrders from './pages/operations/OperationsOrders';
+import OperationsCustomers from './pages/operations/OperationsCustomers';
+import OperationsFinance from './pages/operations/OperationsFinance';
+import OperationsMarketing from './pages/operations/OperationsMarketing';
+import OperationsSupport from './pages/operations/OperationsSupport';
+import OperationsDelivery from './pages/operations/OperationsDelivery';
+import OperationsContent from './pages/operations/OperationsContent';
 
 // Superuser Dashboard Pages (Phase 3)
 import SuperuserDashboard from './pages/superuser/SuperuserDashboard';
@@ -97,7 +112,7 @@ const AppRouter = () => {
         <Route path="order-history" element={<OrderHistory/>} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:uid/:token" element={<ResetPasswordConfirm />} />
-
+        <Route path="access-denied" element={<AccessDenied />} />
         </Route>   
 
       {/* Customer Dashboard Routes */}
@@ -114,7 +129,23 @@ const AppRouter = () => {
         <Route path="address" element={<DashboardAddress />} />
       </Route>
 
-      {/* Seller Dashboard Routes — Phase 2 */}
+      {/* Operations Dashboard Routes — Unified dashboard for all operational roles */}
+      <Route path="/operations" element={<OperationsProtectedRoute />}>
+        <Route element={<OperationsLayout />}>
+          <Route index                element={<OperationsDashboard />} />
+          <Route path="products"       element={<OperationsProducts />} />
+          <Route path="inventory"      element={<OperationsInventory />} />
+          <Route path="orders"         element={<OperationsOrders />} />
+          <Route path="customers"      element={<OperationsCustomers />} />
+          <Route path="finance"        element={<OperationsFinance />} />
+          <Route path="marketing"      element={<OperationsMarketing />} />
+          <Route path="support"        element={<OperationsSupport />} />
+          <Route path="delivery"       element={<OperationsDelivery />} />
+          <Route path="content"        element={<OperationsContent />} />
+        </Route>
+      </Route>
+
+      {/* Seller Dashboard Routes — Legacy routes for backward compatibility */}
       <Route path="/seller" element={<SellerProtectedRoute />}>
         <Route element={<SellerLayout />}>
           <Route index             element={<SellerDashboard />} />
@@ -168,19 +199,19 @@ function App() {
           },
         }}
       />
-      <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <NotificationProvider>
-              <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <NotificationProvider>
                 <StoreSettingsProvider>
                   <AppRouter />
                 </StoreSettingsProvider>
-              </BrowserRouter>
-            </NotificationProvider>
-          </WishlistProvider>
-        </CartProvider>
-      </AuthProvider>
+              </NotificationProvider>
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }
