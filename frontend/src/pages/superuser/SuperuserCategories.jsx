@@ -199,7 +199,7 @@ const SuperuserCategories = () => {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr]">
 
         {/* ── Create / Edit Form ── */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 h-fit">
+        <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/70 p-5 h-fit">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               {editingId ? (
@@ -264,7 +264,7 @@ const SuperuserCategories = () => {
         </section>
 
         {/* ── Categories Table ── */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+        <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/70 p-5">
           <div className="mb-4 flex items-center justify-between gap-2">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">All Categories</h2>

@@ -214,7 +214,7 @@ const SuperuserAuditLog = () => {
       )}
 
       {/* ── Filter Panel ── */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+      <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/70 p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold text-slate-900 dark:text-slate-200">Filters</h2>
           {hasActiveFilters && (
@@ -284,7 +284,7 @@ const SuperuserAuditLog = () => {
       </section>
 
       {/* ── Audit Table ── */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+      <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/70 p-5 sm:p-6">
         <div className="mb-4 flex items-center justify-between gap-2">
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Event Log</h2>
@@ -337,7 +337,7 @@ const SuperuserAuditLog = () => {
       </section>
 
       {/* ── Legend ── */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
+      <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/40 p-5">
         <p className="text-xs font-bold text-slate-600 dark:text-slate-500 uppercase tracking-wider mb-3">Tracked Actions</p>
         <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4">
           {[

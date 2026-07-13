@@ -278,7 +278,7 @@ const SellerProducts = () => {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr_1.5fr]">
 
         {/* ── Create / Edit Form ── */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 h-fit">
+        <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/70 p-5 sm:p-6 h-fit">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
@@ -403,7 +403,7 @@ const SellerProducts = () => {
         </section>
 
         {/* ── Live Inventory Table ── */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+        <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/70 p-5 sm:p-6">
           <div className="mb-4 flex items-center justify-between gap-2">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Live Inventory</h2>

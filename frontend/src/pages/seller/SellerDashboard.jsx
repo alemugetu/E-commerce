@@ -124,7 +124,7 @@ const SellerDashboard = () => {
       </div>
 
       {/* ── Quick Actions ── */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/60 p-6">
         <p className="text-sm font-bold text-slate-900 dark:text-slate-200 mb-4">Quick Actions</p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {quickActions.map(action => (
@@ -144,7 +144,7 @@ const SellerDashboard = () => {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 
         {/* Order Status Breakdown */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/60 p-6">
           <p className="text-sm font-bold text-slate-900 dark:text-slate-200 mb-4">Order Summary</p>
           {loading ? (
             <LoadingSkeleton count={3} className="h-6 mb-3" />
@@ -177,7 +177,7 @@ const SellerDashboard = () => {
         </div>
 
         {/* Inventory Health */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/60 p-6">
           <p className="text-sm font-bold text-slate-900 dark:text-slate-200 mb-4">Inventory Health</p>
           {loading ? (
             <LoadingSkeleton count={3} className="h-6 mb-3" />

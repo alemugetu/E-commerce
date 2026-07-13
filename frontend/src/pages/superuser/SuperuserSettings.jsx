@@ -130,15 +130,15 @@ const SuperuserSettings = () => {
 
       {/* ── Header ── */}
       <div>
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-400">Configuration</p>
-        <h1 className="mt-1 text-2xl font-black text-slate-100">Store Settings</h1>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-600 dark:text-purple-400">Configuration</p>
+        <h1 className="mt-1 text-2xl font-black text-slate-900 dark:text-slate-100">Store Settings</h1>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Manage company information, social media, branding, and SEO. Changes reflect across the public site immediately.
         </p>
       </div>
 
       {/* ── Section Tabs ── */}
-      <div className="flex gap-1 rounded-xl border border-slate-800 bg-slate-900/50 p-1 overflow-x-auto">
+      <div className="flex gap-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/50 p-1 overflow-x-auto">
         {SECTION_TABS.map(tab => (
           <button
             key={tab.id}
@@ -158,7 +158,7 @@ const SuperuserSettings = () => {
 
         {/* ── Company Info ─────────────────────────────────────────────── */}
         {activeSection === 'company' && (
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 space-y-4">
+          <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/70 p-5 sm:p-6 space-y-4">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Company Information</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
@@ -224,7 +224,7 @@ const SuperuserSettings = () => {
 
         {/* ── Social Media ──────────────────────────────────────────────── */}
         {activeSection === 'social' && (
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 space-y-4">
+          <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/70 p-5 sm:p-6 space-y-4">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Social Media</h2>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
@@ -254,7 +254,7 @@ const SuperuserSettings = () => {
 
         {/* ── Footer & SEO ──────────────────────────────────────────────── */}
         {activeSection === 'seo' && (
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 space-y-4">
+          <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/70 p-5 sm:p-6 space-y-4">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Footer & SEO</h2>
             <div>
               <label className={labelCls}>Footer Description</label>
