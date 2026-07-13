@@ -110,10 +110,10 @@ const Products = () => {
   return (
     <div className="pb-12">
       <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
           Shop Products
         </h1>
-        <p className="text-slate-500 mt-2 text-sm sm:text-base">
+        <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm sm:text-base">
           Browse our full catalog with filters tailored to what you need.
         </p>
       </div>
@@ -121,7 +121,7 @@ const Products = () => {
       <button
         type="button"
         onClick={() => setSidebarOpen(true)}
-        className="lg:hidden mb-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+        className="lg:hidden mb-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
       >
         <HiAdjustmentsHorizontal className="w-5 h-5" />
         Filters
@@ -158,7 +158,7 @@ const Products = () => {
 
         <div className="flex-1 min-w-0">
           <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               {isLoading ? 'Loading products…' : `${count || 0} product${count === 1 ? '' : 's'} found`}
             </p>
           </div>
@@ -177,9 +177,9 @@ const Products = () => {
           )}
 
           {!isLoading && !isError && products.length === 0 && (
-            <div className="py-16 text-center bg-white rounded-2xl border border-slate-200">
-              <h3 className="font-bold text-xl text-slate-800 mb-2">No Products Found</h3>
-              <p className="text-sm text-slate-500 mb-4">
+            <div className="py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">No Products Found</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
                 Try adjusting your filters or search terms.
               </p>
               <button
@@ -206,18 +206,18 @@ const Products = () => {
                     type="button"
                     disabled={!previous}
                     onClick={() => setFilters((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
-                    className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+                    className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                   >
                     Previous
                   </button>
-                  <span className="text-sm text-slate-500">
+                  <span className="text-sm text-slate-500 dark:text-slate-400">
                     Page {filters.page} of {totalPages}
                   </span>
                   <button
                     type="button"
                     disabled={!next}
                     onClick={() => setFilters((prev) => ({ ...prev, page: prev.page + 1 }))}
-                    className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+                    className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                   >
                     Next
                   </button>

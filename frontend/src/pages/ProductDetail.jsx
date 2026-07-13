@@ -115,9 +115,9 @@ const ProductDetail = () => {
   if (isError || !product) {
     return (
       <div className="max-w-md mx-auto px-4 py-24 text-center">
-        <Card className="p-6 border-red-100 bg-red-50/50">
-          <h3 className="font-bold text-red-800 text-lg">Product Information Unavailable</h3>
-          <p className="text-slate-600 text-sm mt-1">
+        <Card className="p-6 border-red-100 dark:border-red-900/30 bg-red-50/50 dark:bg-red-900/10">
+          <h3 className="font-bold text-red-800 dark:text-red-400 text-lg">Product Information Unavailable</h3>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
             The item may have been unlisted or removed from inventory.
           </p>
           <Button variant="primary" className="mt-4 w-full" onClick={() => navigate('/')}>
@@ -147,19 +147,19 @@ const ProductDetail = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
       {/* Breadcrumb */}
-      <nav className="mb-8 text-sm text-slate-500 font-medium flex items-center gap-1">
-        <Link to="/" className="hover:text-indigo-600 transition-colors">
+      <nav className="mb-8 text-sm text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
+        <Link to="/" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
           Marketplace
         </Link>
-        <span className="text-slate-300 mx-1">/</span>
+        <span className="text-slate-300 dark:text-slate-600 mx-1">/</span>
         <span
-          className="text-indigo-500 hover:text-indigo-700 cursor-pointer transition-colors"
+          className="text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 cursor-pointer transition-colors"
           onClick={() => navigate(-1)}
         >
           {categoryName}
         </span>
-        <span className="text-slate-300 mx-1">/</span>
-        <span className="text-slate-800 font-semibold truncate max-w-[200px]">
+        <span className="text-slate-300 dark:text-slate-600 mx-1">/</span>
+        <span className="text-slate-800 dark:text-slate-200 font-semibold truncate max-w-[200px]">
           {product.name}
         </span>
       </nav>
@@ -221,7 +221,7 @@ const ProductDetail = () => {
               {categoryName}
             </span>
             {product.brand && (
-              <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full">
+              <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold rounded-full">
                 {product.brand}
               </span>
             )}
@@ -229,8 +229,8 @@ const ProductDetail = () => {
               onClick={handleToggleWishlist}
               className={`p-2 rounded-full transition-colors ${
                 isInWishlist
-                  ? 'bg-red-50 text-red-500 hover:bg-red-100'
-                  : 'bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-red-500'
+                  ? 'bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-red-500 dark:hover:text-red-400'
               }`}
               aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
             >
@@ -239,18 +239,18 @@ const ProductDetail = () => {
           </div>
 
           {/* Product name */}
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight leading-tight">
             {product.name}
           </h1>
 
           {/* Price block */}
-          <div className="flex items-baseline gap-3 border-b border-slate-100 pb-5">
-            <span className="text-3xl font-black text-slate-900">
+          <div className="flex items-baseline gap-3 border-b border-slate-100 dark:border-slate-800 pb-5">
+            <span className="text-3xl font-black text-slate-900 dark:text-slate-100">
               {displayPrice.toLocaleString()}{' '}
-              <span className="text-lg font-bold text-slate-500">ETB</span>
+              <span className="text-lg font-bold text-slate-500 dark:text-slate-400">ETB</span>
             </span>
             {hasDiscount && (
-              <span className="text-lg font-semibold text-slate-400 line-through">
+              <span className="text-lg font-semibold text-slate-400 dark:text-slate-500 line-through">
                 {parseFloat(product.price).toLocaleString()} ETB
               </span>
             )}
@@ -263,10 +263,10 @@ const ProductDetail = () => {
 
           {/* Description */}
           <div>
-            <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-2">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-2">
               Description
             </h4>
-            <p className="text-slate-600 text-base leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 text-base leading-relaxed">
               {product.description ||
                 'Detailed specification overview not yet drafted for this item.'}
             </p>
@@ -293,23 +293,23 @@ const ProductDetail = () => {
 
             {/* Quantity selector */}
             <div className="flex items-center gap-4">
-              <span className="text-sm font-semibold text-slate-700">Quantity</span>
-              <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Quantity</span>
+              <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-900 shadow-sm">
                 <button
                   onClick={decrementQty}
                   disabled={quantity <= 1 || isAdding}
-                  className="px-3 py-2 text-slate-600 hover:bg-slate-100 font-bold transition-colors disabled:opacity-40"
+                  className="px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold transition-colors disabled:opacity-40"
                   aria-label="Decrease quantity"
                 >
                   −
                 </button>
-                <span className="px-4 py-2 text-sm font-bold text-slate-900 min-w-[2.5rem] text-center select-none">
+                <span className="px-4 py-2 text-sm font-bold text-slate-900 dark:text-slate-100 min-w-[2.5rem] text-center select-none">
                   {quantity}
                 </span>
                 <button
                   onClick={incrementQty}
                   disabled={quantity >= (product.stock ?? 9999) || isAdding}
-                  className="px-3 py-2 text-slate-600 hover:bg-slate-100 font-bold transition-colors disabled:opacity-40"
+                  className="px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold transition-colors disabled:opacity-40"
                   aria-label="Increase quantity"
                 >
                   +
@@ -340,9 +340,9 @@ const ProductDetail = () => {
 
           {/* Meta row */}
           {(product.rating > 0 || product.num_reviews > 0) && (
-            <div className="flex items-center gap-2 text-sm text-slate-500">
+            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
               <span className="text-amber-400 font-bold">★</span>
-              <span className="font-semibold text-slate-700">{product.rating}</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300">{product.rating}</span>
               <span>({product.num_reviews} reviews)</span>
             </div>
           )}

@@ -86,9 +86,9 @@ const AppRouter = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen bg-white dark:bg-slate-950 flex flex-col items-center justify-center gap-4">
         <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-        <p className="text-sm font-medium text-slate-400 tracking-wide animate-pulse">
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-400 tracking-wide animate-pulse">
           Establishing Secure Connection...
         </p>
       </div>

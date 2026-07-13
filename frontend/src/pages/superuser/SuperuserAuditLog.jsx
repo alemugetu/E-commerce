@@ -122,7 +122,7 @@ const SuperuserAuditLog = () => {
       key: 'timestamp',
       label: 'When',
       render: (_, row) => (
-        <span className="text-xs text-slate-400 whitespace-nowrap">
+        <span className="text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
           {row.formatted_timestamp}
         </span>
       ),
@@ -131,7 +131,7 @@ const SuperuserAuditLog = () => {
       key: 'actor_email',
       label: 'Actor',
       render: (val) => (
-        <span className="text-sm font-medium text-slate-200">{val}</span>
+        <span className="text-sm font-medium text-slate-900 dark:text-slate-200">{val}</span>
       ),
     },
     {
@@ -149,41 +149,41 @@ const SuperuserAuditLog = () => {
       key: 'target',
       label: 'Target',
       render: (val) => (
-        <span className="text-sm text-slate-300 font-mono text-xs">{val || '—'}</span>
+        <span className="text-sm text-slate-900 dark:text-slate-300 font-mono text-xs">{val || '—'}</span>
       ),
     },
     {
       key: 'details',
       label: 'Details',
       render: (val) => {
-        if (!val || Object.keys(val).length === 0) return <span className="text-slate-600 text-xs">—</span>;
+        if (!val || Object.keys(val).length === 0) return <span className="text-slate-600 dark:text-slate-600 text-xs">—</span>;
         // Show the most relevant detail field
         const relevantKey = ['role', 'new_role', 'new_status', 'changed_fields', 'old_status'].find(k => k in val);
         if (relevantKey) {
           const v = val[relevantKey];
           return (
-            <span className="text-xs text-slate-400">
-              {relevantKey.replace(/_/g, ' ')}: <span className="text-slate-200 font-medium">
+            <span className="text-xs text-slate-600 dark:text-slate-400">
+              {relevantKey.replace(/_/g, ' ')}: <span className="text-slate-900 dark:text-slate-200 font-medium">
                 {Array.isArray(v) ? v.join(', ') : String(v)}
               </span>
             </span>
           );
         }
-        return <span className="text-xs text-slate-500 italic">See details</span>;
+        return <span className="text-xs text-slate-600 dark:text-slate-500 italic">See details</span>;
       },
     },
     {
       key: 'ip_address',
       label: 'IP',
       render: (val) => (
-        <span className="text-xs font-mono text-slate-500">{val || '—'}</span>
+        <span className="text-xs font-mono text-slate-600 dark:text-slate-500">{val || '—'}</span>
       ),
     },
   ];
 
   // ── Input Styles ──────────────────────────────────────────────────────────
-  const inputCls = 'w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/40 transition';
-  const labelCls = 'mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400';
+  const inputCls = 'w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/80 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none focus:border-purple-500 dark:focus:border-purple-500 focus:ring-1 focus:ring-purple-500/40 transition';
+  const labelCls = 'mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400';
 
   return (
     <div className="space-y-6">
@@ -191,15 +191,15 @@ const SuperuserAuditLog = () => {
       {/* ── Header ── */}
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-400">System Monitoring</p>
-          <h1 className="mt-1 text-2xl font-black text-slate-100">Audit Log</h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-600 dark:text-purple-400">System Monitoring</p>
+          <h1 className="mt-1 text-2xl font-black text-slate-900 dark:text-slate-100">Audit Log</h1>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
             Immutable record of all privileged actions across the platform.
           </p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-slate-500">Total entries</p>
-          <p className="text-2xl font-black text-slate-200">
+          <p className="text-xs text-slate-600 dark:text-slate-500">Total entries</p>
+          <p className="text-2xl font-black text-slate-900 dark:text-slate-200">
             {loading && !meta.count ? '—' : meta.count.toLocaleString()}
           </p>
         </div>
@@ -207,7 +207,7 @@ const SuperuserAuditLog = () => {
 
       {/* ── Error ── */}
       {error && (
-        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">
+        <div className="rounded-xl border border-rose-500/20 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-400">
           {error}
           <button onClick={() => loadLogs(page)} className="ml-3 underline">Retry</button>
         </div>
@@ -216,11 +216,11 @@ const SuperuserAuditLog = () => {
       {/* ── Filter Panel ── */}
       <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-slate-200">Filters</h2>
+          <h2 className="text-sm font-bold text-slate-900 dark:text-slate-200">Filters</h2>
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="text-xs text-rose-400 hover:text-rose-300 transition"
+              className="text-xs text-rose-700 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 transition"
             >
               ✕ Clear filters
             </button>
@@ -287,15 +287,15 @@ const SuperuserAuditLog = () => {
       <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
         <div className="mb-4 flex items-center justify-between gap-2">
           <div>
-            <h2 className="text-base font-bold text-slate-100">Event Log</h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Event Log</h2>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
               {loading ? 'Loading…' : `${meta.count} entries · Page ${meta.page} of ${meta.totalPages}`}
             </p>
           </div>
           <button
             onClick={() => loadLogs(page)}
             disabled={loading}
-            className="text-xs text-slate-400 hover:text-slate-200 transition"
+            className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition"
           >
             {loading ? '…' : '↻ Refresh'}
           </button>
@@ -318,17 +318,17 @@ const SuperuserAuditLog = () => {
             <button
               onClick={() => setPage(p => p - 1)}
               disabled={!meta.hasPrev || loading}
-              className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-700 transition"
+              className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition"
             >
               ← Previous
             </button>
-            <span className="text-xs text-slate-500 font-medium">
+            <span className="text-xs text-slate-600 dark:text-slate-500 font-medium">
               Page {meta.page} of {meta.totalPages}
             </span>
             <button
               onClick={() => setPage(p => p + 1)}
               disabled={!meta.hasNext || loading}
-              className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-700 transition"
+              className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition"
             >
               Next →
             </button>
@@ -338,7 +338,7 @@ const SuperuserAuditLog = () => {
 
       {/* ── Legend ── */}
       <section className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Tracked Actions</p>
+        <p className="text-xs font-bold text-slate-600 dark:text-slate-500 uppercase tracking-wider mb-3">Tracked Actions</p>
         <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4">
           {[
             { label: 'User Created/Deleted', variant: 'success' },
@@ -354,7 +354,7 @@ const SuperuserAuditLog = () => {
           ].map(item => (
             <div key={item.label} className="flex items-center gap-2 py-1">
               <StatusBadge status="●" variant={item.variant} size="sm" />
-              <span className="text-xs text-slate-500">{item.label}</span>
+              <span className="text-xs text-slate-600 dark:text-slate-500">{item.label}</span>
             </div>
           ))}
         </div>

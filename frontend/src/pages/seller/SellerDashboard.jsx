@@ -84,18 +84,18 @@ const SellerDashboard = () => {
 
       {/* ── Header ── */}
       <div>
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-emerald-400">Seller Panel</p>
-        <h1 className="mt-1 text-2xl font-black text-slate-100">
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-emerald-600 dark:text-emerald-400">Seller Panel</p>
+        <h1 className="mt-1 text-2xl font-black text-slate-900 dark:text-slate-100">
           Welcome back, {displayName.split(' ')[0]} 👋
         </h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Here's an overview of your store performance.
         </p>
       </div>
 
       {/* ── Error ── */}
       {error && (
-        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">
+        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-400">
           {error}
           <button
             onClick={loadMetrics}
@@ -125,7 +125,7 @@ const SellerDashboard = () => {
 
       {/* ── Quick Actions ── */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-        <p className="text-sm font-bold text-slate-200 mb-4">Quick Actions</p>
+        <p className="text-sm font-bold text-slate-900 dark:text-slate-200 mb-4">Quick Actions</p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {quickActions.map(action => (
             <Link
@@ -145,7 +145,7 @@ const SellerDashboard = () => {
 
         {/* Order Status Breakdown */}
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <p className="text-sm font-bold text-slate-200 mb-4">Order Summary</p>
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-200 mb-4">Order Summary</p>
           {loading ? (
             <LoadingSkeleton count={3} className="h-6 mb-3" />
           ) : (
@@ -159,11 +159,11 @@ const SellerDashboard = () => {
                 const pct = total > 0 ? Math.round((item.value / total) * 100) : 0;
                 return (
                   <div key={item.label}>
-                    <div className="flex justify-between text-xs text-slate-400 mb-1">
+                    <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
                       <span>{item.label}</span>
                       <span>{item.value} ({pct}%)</span>
                     </div>
-                    <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+                    <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
                       <div
                         className={`h-full rounded-full ${item.color} transition-all duration-500`}
                         style={{ width: `${pct}%` }}
@@ -178,7 +178,7 @@ const SellerDashboard = () => {
 
         {/* Inventory Health */}
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <p className="text-sm font-bold text-slate-200 mb-4">Inventory Health</p>
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-200 mb-4">Inventory Health</p>
           {loading ? (
             <LoadingSkeleton count={3} className="h-6 mb-3" />
           ) : (
@@ -196,11 +196,11 @@ const SellerDashboard = () => {
                 const pct = total > 0 ? Math.round((item.value / total) * 100) : 0;
                 return (
                   <div key={item.label}>
-                    <div className="flex justify-between text-xs text-slate-400 mb-1">
+                    <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
                       <span>{item.label}</span>
                       <span>{item.value}</span>
                     </div>
-                    <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+                    <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
                       <div
                         className={`h-full rounded-full ${item.color} transition-all duration-500`}
                         style={{ width: `${pct}%` }}

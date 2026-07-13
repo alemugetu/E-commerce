@@ -22,8 +22,8 @@ import { Edit, Plus, X } from 'lucide-react';
 
 const EMPTY_FORM = { name: '', parent: '' };
 
-const inputCls = 'w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/40 transition';
-const labelCls = 'mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400';
+const inputCls = 'w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/80 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none focus:border-purple-500 dark:focus:border-purple-500 focus:ring-1 focus:ring-purple-500/40 transition';
+const labelCls = 'mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400';
 
 const SuperuserCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -137,8 +137,8 @@ const SuperuserCategories = () => {
       label: 'Category',
       render: (val, row) => (
         <div>
-          <p className="font-semibold text-slate-100">{val}</p>
-          <p className="text-xs font-mono text-slate-500">{row.slug}</p>
+          <p className="font-semibold text-slate-900 dark:text-slate-100">{val}</p>
+          <p className="text-xs font-mono text-slate-600 dark:text-slate-500">{row.slug}</p>
         </div>
       ),
     },
@@ -146,9 +146,9 @@ const SuperuserCategories = () => {
       key: 'parent',
       label: 'Parent',
       render: (val) => {
-        if (!val) return <span className="text-xs text-slate-500 italic">Root</span>;
+        if (!val) return <span className="text-xs text-slate-600 dark:text-slate-500 italic">Root</span>;
         const parent = flatCategories.find(c => c.id === val);
-        return <span className="text-xs text-slate-300">{parent?.name ?? `ID:${val}`}</span>;
+        return <span className="text-xs text-slate-900 dark:text-slate-300">{parent?.name ?? `ID:${val}`}</span>;
       },
     },
     {
@@ -169,13 +169,13 @@ const SuperuserCategories = () => {
         <div className="flex justify-end gap-2">
           <button
             onClick={() => handleEditClick(row)}
-            className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-semibold text-indigo-400 hover:bg-indigo-500/20 transition"
+            className="rounded-lg border border-indigo-500/20 dark:border-indigo-500/20 bg-indigo-500/10 dark:bg-indigo-500/10 px-2.5 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-400 hover:bg-indigo-500/20 dark:hover:bg-indigo-500/20 transition"
           >
             Edit
           </button>
           <button
             onClick={() => openDeleteModal(row)}
-            className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-2.5 py-1.5 text-xs font-semibold text-rose-400 hover:bg-rose-500/20 transition"
+            className="rounded-lg border border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/10 px-2.5 py-1.5 text-xs font-semibold text-rose-700 dark:text-rose-400 hover:bg-rose-500/20 dark:hover:bg-rose-500/20 transition"
           >
             Delete
           </button>
@@ -189,9 +189,9 @@ const SuperuserCategories = () => {
 
       {/* ── Header ── */}
       <div>
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-400">Catalog Structure</p>
-        <h1 className="mt-1 text-2xl font-black text-slate-100">Categories</h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-600 dark:text-purple-400">Catalog Structure</p>
+        <h1 className="mt-1 text-2xl font-black text-slate-900 dark:text-slate-100">Categories</h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Manage the product taxonomy. Categories support nesting (parent → children).
         </p>
       </div>
@@ -201,7 +201,7 @@ const SuperuserCategories = () => {
         {/* ── Create / Edit Form ── */}
         <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 h-fit">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               {editingId ? (
                 <>
                   <Edit className="w-4 h-4" />
@@ -217,7 +217,7 @@ const SuperuserCategories = () => {
             {editingId && (
               <button
                 onClick={handleCancelEdit}
-                className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1"
+                className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 flex items-center gap-1"
               >
                 <X className="w-3 h-3" />
                 Cancel
@@ -247,7 +247,7 @@ const SuperuserCategories = () => {
                   </option>
                 ))}
               </select>
-              <p className="mt-1 text-[10px] text-slate-500">
+              <p className="mt-1 text-[10px] text-slate-600 dark:text-slate-500">
                 Leave blank to create a root-level category.
               </p>
             </div>
@@ -267,15 +267,15 @@ const SuperuserCategories = () => {
         <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
           <div className="mb-4 flex items-center justify-between gap-2">
             <div>
-              <h2 className="text-base font-bold text-slate-100">All Categories</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">All Categories</h2>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                 {loading ? 'Loading…' : `${flatCategories.length} categories total`}
               </p>
             </div>
             <button
               onClick={loadCategories}
               disabled={loading}
-              className="text-xs text-slate-400 hover:text-slate-200 transition"
+              className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition"
             >
               {loading ? '…' : '↻ Refresh'}
             </button>

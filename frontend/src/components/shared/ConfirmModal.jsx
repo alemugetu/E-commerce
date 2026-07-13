@@ -37,9 +37,9 @@ const ConfirmModal = ({
   const buttonClass = variantClasses[variant] || variantClasses.danger;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 dark:bg-slate-950/90 backdrop-blur-sm p-4">
       <div
-        className="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200"
+        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200"
         role="dialog"
         aria-labelledby="modal-title"
         aria-describedby="modal-message"
@@ -48,7 +48,7 @@ const ConfirmModal = ({
         <div className="mb-4">
           <h3
             id="modal-title"
-            className="text-lg font-bold text-slate-100"
+            className="text-lg font-bold text-slate-900 dark:text-slate-100"
           >
             {title}
           </h3>
@@ -59,7 +59,7 @@ const ConfirmModal = ({
           <div className="mb-6">
             <p
               id="modal-message"
-              className="text-sm text-slate-300 leading-relaxed"
+              className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed"
             >
               {message}
             </p>
@@ -71,7 +71,7 @@ const ConfirmModal = ({
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 bg-slate-800 border border-slate-700 hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {cancelText}
           </button>

@@ -80,8 +80,8 @@ const DashboardAddress = () => {
     return (
       <div className="text-center py-16">
         <p className="text-3xl mb-3">&#9888;</p>
-        <h3 className="text-lg font-bold text-slate-900">Could Not Load Address</h3>
-        <p className="text-sm text-slate-500 mt-1 mb-5">{fetchError}</p>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Could Not Load Address</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-5">{fetchError}</p>
         <button
           onClick={() => window.location.reload()}
           className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition"
@@ -97,8 +97,8 @@ const DashboardAddress = () => {
     <div>
       {/* Section header */}
       <div className="mb-6">
-        <h2 className="text-xl font-black text-slate-900">Shipping Address</h2>
-        <p className="text-xs text-slate-400 mt-0.5">
+        <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">Shipping Address</h2>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
           This address is used as the default delivery destination for your orders.
         </p>
       </div>
@@ -115,7 +115,7 @@ const DashboardAddress = () => {
 
           {/* Phone number */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
               Phone Number
             </label>
             <input
@@ -124,13 +124,13 @@ const DashboardAddress = () => {
               value={form.phone_number}
               onChange={handleChange}
               placeholder="+251 911 000 000"
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+              className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 transition"
             />
           </div>
 
           {/* Delivery address */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
               Delivery Address
             </label>
             <textarea
@@ -139,9 +139,9 @@ const DashboardAddress = () => {
               onChange={handleChange}
               rows={3}
               placeholder="Sub-city, Woreda, House Number, Landmark..."
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition resize-none"
+              className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 transition resize-none"
             />
-            <p className="text-[11px] text-slate-400 mt-1">
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
               Include as much detail as possible to ensure accurate delivery.
             </p>
           </div>

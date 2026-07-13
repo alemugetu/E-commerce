@@ -19,7 +19,7 @@ const renderStars = (rating) => {
     } else if (value >= i - 0.5) {
       stars.push(<FaStarHalfAlt key={i} className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />);
     } else {
-      stars.push(<FaRegStar key={i} className="w-3.5 h-3.5 text-slate-300" aria-hidden="true" />);
+      stars.push(<FaRegStar key={i} className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" aria-hidden="true" />);
     }
   }
 
@@ -52,10 +52,10 @@ const ProductCard = ({ product }) => {
 
   return (
     <>
-      <Card className="group flex flex-col h-full overflow-hidden hover:shadow-lg hover:border-emerald-200 transition-all duration-300 hover:-translate-y-1">
+      <Card className="group flex flex-col h-full overflow-hidden hover:shadow-lg hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-300 hover:-translate-y-1">
         <div className="relative">
           <Link to={`/product/${product.id}`} className="block">
-            <div className="aspect-square bg-slate-100 overflow-hidden">
+            <div className="aspect-square bg-slate-100 dark:bg-slate-800 overflow-hidden">
               <img
                 src={imageSrc}
                 alt={product.name}
@@ -71,7 +71,7 @@ const ProductCard = ({ product }) => {
             className={`absolute top-3 right-3 p-2 rounded-full shadow-md transition-colors ${
               inWishlist
                 ? 'bg-emerald-600 text-white'
-                : 'bg-white text-slate-500 hover:text-emerald-600 hover:bg-emerald-50'
+                : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
             }`}
           >
             <HiHeart className="w-4 h-4" />
@@ -79,31 +79,31 @@ const ProductCard = ({ product }) => {
         </div>
 
         <div className="flex flex-col flex-1 p-4">
-          <span className="text-xs font-semibold tracking-wider text-emerald-600 uppercase">
+          <span className="text-xs font-semibold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
             {categoryLabel}
           </span>
 
           <Link
             to={`/product/${product.id}`}
-            className="mt-1 font-bold text-slate-900 line-clamp-2 hover:text-emerald-600 transition-colors"
+            className="mt-1 font-bold text-slate-900 dark:text-slate-100 line-clamp-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
             {product.name}
           </Link>
 
           <div className="flex items-center gap-1 mt-2" aria-label={`Rating ${product.rating} out of 5`}>
             {renderStars(product.rating)}
-            <span className="text-xs text-slate-500 ml-1">
+            <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
               ({product.num_reviews || 0})
             </span>
           </div>
 
           <div className="mt-3 flex items-end gap-2">
-            <span className="text-lg font-extrabold text-slate-900">
+            <span className="text-lg font-extrabold text-slate-900 dark:text-slate-100">
               {formatPrice(displayPrice)}{' '}
-              <span className="text-sm font-medium text-slate-500">ETB</span>
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">ETB</span>
             </span>
             {hasDiscount && (
-              <span className="text-sm text-slate-400 line-through">
+              <span className="text-sm text-slate-400 dark:text-slate-500 line-through">
                 {formatPrice(product.price)} ETB
               </span>
             )}
@@ -119,7 +119,7 @@ const ProductCard = ({ product }) => {
             <button
               type="button"
               onClick={() => setQuickViewOpen(true)}
-              className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg font-medium text-sm border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg font-medium text-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all duration-200"
             >
               <HiEye className="w-4 h-4" />
               Quick View
@@ -133,26 +133,26 @@ const ProductCard = ({ product }) => {
           <img
             src={imageSrc}
             alt={product.name}
-            className="w-full h-48 object-cover rounded-xl bg-slate-100"
+            className="w-full h-48 object-cover rounded-xl bg-slate-100 dark:bg-slate-800"
           />
-          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
+          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
             {categoryLabel}
           </p>
           <div className="flex items-center gap-1">
             {renderStars(product.rating)}
-            <span className="text-xs text-slate-500 ml-1">({product.num_reviews || 0} reviews)</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">({product.num_reviews || 0} reviews)</span>
           </div>
-          <p className="text-sm text-slate-600 line-clamp-4">
+          <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-4">
             {product.description || 'No description provided.'}
           </p>
           <div className="flex items-center justify-between pt-2">
-            <span className="text-xl font-bold text-slate-900">
+            <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
               {formatPrice(displayPrice)} ETB
             </span>
             <Link
               to={`/product/${product.id}`}
               onClick={() => setQuickViewOpen(false)}
-              className="text-sm font-semibold text-emerald-600 hover:text-emerald-700"
+              className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
             >
               View full details
             </Link>

@@ -38,10 +38,10 @@ const statusStyle = (status) => {
     case 'Paid':        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
     case 'Pending':     return 'bg-amber-50  text-amber-700  border-amber-200';
     case 'Processing':  return 'bg-blue-50   text-blue-700   border-blue-200';
-    case 'Shipped':     return 'bg-indigo-50 text-indigo-700 border-indigo-200';
-    case 'Delivered':   return 'bg-teal-50   text-teal-700   border-teal-200';
-    case 'Cancelled':   return 'bg-rose-50   text-rose-700   border-rose-200';
-    default:            return 'bg-slate-50  text-slate-600  border-slate-200';
+    case 'Shipped':     return 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800';
+    case 'Delivered':   return 'bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 border-teal-200 dark:border-teal-800';
+    case 'Cancelled':   return 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800';
+    default:            return 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700';
   }
 };
 
@@ -112,8 +112,8 @@ const DashboardOrders = () => {
     return (
       <div className="text-center py-16">
         <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-amber-500" />
-        <h3 className="text-lg font-bold text-slate-900">Failed to Load Orders</h3>
-        <p className="text-sm text-slate-500 mt-1 mb-5">{error}</p>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Failed to Load Orders</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-5">{error}</p>
         <button
           onClick={() => load(page)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition"
@@ -129,8 +129,8 @@ const DashboardOrders = () => {
     return (
       <div className="text-center py-20">
         <Package className="w-16 h-16 mx-auto mb-4 text-indigo-500" />
-        <h3 className="text-xl font-bold text-slate-900">No Orders Yet</h3>
-        <p className="text-sm text-slate-500 mt-2">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">No Orders Yet</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
           Once you complete a purchase, your order history will appear here.
         </p>
       </div>
@@ -143,10 +143,10 @@ const DashboardOrders = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-xl font-black text-slate-900">Order History</h2>
-          <p className="text-xs text-slate-400 mt-0.5">Your past purchases and fulfillment statuses.</p>
+          <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">Order History</h2>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Your past purchases and fulfillment statuses.</p>
         </div>
-        <span className="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1.5 rounded-full border border-slate-200">
+        <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
           {meta.total} order{meta.total !== 1 ? 's' : ''}
         </span>
       </div>
@@ -159,15 +159,15 @@ const DashboardOrders = () => {
             className="border border-slate-100 rounded-xl overflow-hidden shadow-sm"
           >
             {/* Card header */}
-            <div className="bg-slate-50 px-5 py-3.5 border-b border-slate-100 flex flex-wrap gap-3 justify-between items-center">
-              <div className="flex gap-5 text-xs text-slate-500">
+            <div className="bg-slate-50 dark:bg-slate-800 px-5 py-3.5 border-b border-slate-100 dark:border-slate-700 flex flex-wrap gap-3 justify-between items-center">
+              <div className="flex gap-5 text-xs text-slate-500 dark:text-slate-400">
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Date</p>
-                  <p className="font-semibold text-slate-800 mt-0.5">{order.formatted_date}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Date</p>
+                  <p className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5">{order.formatted_date}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Ref #</p>
-                  <p className="font-mono text-slate-700 mt-0.5 select-all">
+                  <p className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Ref #</p>
+                  <p className="font-mono text-slate-700 dark:text-slate-300 mt-0.5 select-all">
                     {order.tx_ref || `ORD-${order.id}`}
                   </p>
                 </div>
@@ -178,7 +178,7 @@ const DashboardOrders = () => {
                     value={order.status}
                     disabled={updatingId === order.id}
                     onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                    className="rounded-full border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-sm outline-none"
+                    className="rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-sm outline-none"
                   >
                     <option value="Pending">Pending</option>
                     <option value="Processing">Processing</option>
@@ -198,13 +198,13 @@ const DashboardOrders = () => {
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                     order.is_paid
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      : 'bg-slate-100 text-slate-500 border-slate-200'
+                      ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   {order.is_paid ? 'Paid' : 'Unpaid'}
                 </span>
-                <span className="text-base font-black text-slate-900">
+                <span className="text-base font-black text-slate-900 dark:text-slate-100">
                   {parseFloat(order.total_amount).toLocaleString()} ETB
                 </span>
               </div>
@@ -226,18 +226,18 @@ const DashboardOrders = () => {
 
                   {/* Name + qty */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-slate-900 text-sm truncate">{item.product_name}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      Qty: <span className="font-semibold text-slate-700">{item.quantity}</span>
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-sm truncate">{item.product_name}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                      Qty: <span className="font-semibold text-slate-700 dark:text-slate-300">{item.quantity}</span>
                       {' · '}
-                      <span className="text-slate-500">
+                      <span className="text-slate-500 dark:text-slate-400">
                         {parseFloat(item.price_at_purchase).toLocaleString()} ETB each
                       </span>
                     </p>
                   </div>
 
                   {/* Subtotal */}
-                  <p className="text-sm font-black text-slate-800 flex-shrink-0">
+                  <p className="text-sm font-black text-slate-800 dark:text-slate-200 flex-shrink-0">
                     {parseFloat(item.subtotal).toLocaleString()} ETB
                   </p>
                 </div>
@@ -253,15 +253,15 @@ const DashboardOrders = () => {
           <button
             disabled={!meta.hasPrev}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="text-xs font-bold px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
+            className="text-xs font-bold px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
           >
             ← Previous
           </button>
-          <span className="text-xs font-bold text-slate-500">Page {page}</span>
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Page {page}</span>
           <button
             disabled={!meta.hasNext}
             onClick={() => setPage((p) => p + 1)}
-            className="text-xs font-bold px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
+            className="text-xs font-bold px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
           >
             Next →
           </button>

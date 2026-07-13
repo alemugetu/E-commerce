@@ -32,16 +32,16 @@ const DataTable = ({
   if (!loading && data.length === 0) {
     return (
       <div className="py-16 text-center">
-        <p className="text-sm text-slate-500">{emptyMessage}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-500">{emptyMessage}</p>
       </div>
     );
   }
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-slate-800 text-left text-sm">
+      <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left text-sm">
         <thead>
-          <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+          <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600 dark:text-slate-500">
             {columns.map((col) => (
               <th
                 key={col.key}
@@ -52,11 +52,11 @@ const DataTable = ({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-800/60">
+        <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
           {data.map((row) => (
             <tr
               key={row[keyField]}
-              className="hover:bg-slate-800/30 transition-colors"
+              className="hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
             >
               {columns.map((col) => (
                 <td
@@ -65,7 +65,7 @@ const DataTable = ({
                 >
                   {col.render
                     ? col.render(row[col.key], row)
-                    : <span className="text-slate-300">{row[col.key]}</span>
+                    : <span className="text-slate-900 dark:text-slate-300">{row[col.key]}</span>
                   }
                 </td>
               ))}

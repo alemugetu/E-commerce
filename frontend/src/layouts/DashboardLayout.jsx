@@ -23,22 +23,22 @@ const DashboardLayout = () => {
       : location.pathname.startsWith(link.to);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-950 font-body">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-950 dark:text-slate-100 font-body">
 
       {/* ── Top header — no logout button here ── */}
-      <header className="w-full bg-white border-b border-slate-200 py-4 px-6 shadow-sm sticky top-0 z-40">
+      <header className="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-4 px-6 shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link to="/" className="text-xl font-bold font-heading text-indigo-600 tracking-tight">
+          <Link to="/" className="text-xl font-bold font-heading text-indigo-600 dark:text-indigo-400 tracking-tight">
             STORE.ET
           </Link>
-          <div className="flex items-center gap-4 text-sm font-medium text-slate-600">
-            <Link to="/" className="hover:text-indigo-600 transition-colors">
+          <div className="flex items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
+            <Link to="/" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
               Marketplace
             </Link>
             {/* Avatar only — logout lives in the sidebar */}
             <div
               title={displayName}
-              className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs border border-indigo-200 select-none"
+              className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs border border-indigo-200 dark:border-indigo-800 select-none"
             >
               {initials}
             </div>
@@ -51,20 +51,20 @@ const DashboardLayout = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
 
           {/* ── Sidebar ── */}
-          <aside className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-1">
+          <aside className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm space-y-1">
 
             {/* Identity block */}
-            <div className="px-4 py-3 border-b border-slate-100 mb-2 flex items-center gap-3">
+            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 mb-2 flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
                 {initials}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-bold text-slate-900 truncate">{displayName}</p>
-                <p className="text-[11px] text-slate-400 truncate">{user?.email}</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">{displayName}</p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{user?.email}</p>
               </div>
             </div>
 
-            <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider pb-1">
+            <p className="px-4 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider pb-1">
               Account
             </p>
 
@@ -75,8 +75,8 @@ const DashboardLayout = () => {
                 to={link.to}
                 className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   isActive(link)
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 {link.label}
@@ -84,10 +84,10 @@ const DashboardLayout = () => {
             ))}
 
             {/* Sign out — single logout location */}
-            <div className="pt-2 border-t border-slate-100 mt-2">
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 mt-2">
               <button
                 onClick={logout}
-                className="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                className="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
               >
                 Sign Out
               </button>
@@ -95,7 +95,7 @@ const DashboardLayout = () => {
           </aside>
 
           {/* ── Main content slot ── */}
-          <main className="md:col-span-3 bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm min-h-[400px]">
+          <main className="md:col-span-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm min-h-[400px]">
             <Outlet />
           </main>
 

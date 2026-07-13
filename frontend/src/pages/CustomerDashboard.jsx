@@ -80,8 +80,8 @@ const CustomerDashboard = () => {
     return (
       <div className="text-center py-16">
         <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-amber-500" />
-        <h3 className="text-lg font-bold text-slate-900">Could Not Load Profile</h3>
-        <p className="text-sm text-slate-500 mt-1 mb-5">{fetchError}</p>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Could Not Load Profile</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-5">{fetchError}</p>
         <button
           onClick={() => window.location.reload()}
           className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition"
@@ -97,8 +97,8 @@ const CustomerDashboard = () => {
     <div>
       {/* Section header */}
       <div className="mb-6">
-        <h2 className="text-xl font-black text-slate-900">My Profile</h2>
-        <p className="text-xs text-slate-400 mt-0.5">
+        <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">My Profile</h2>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
           Update your personal information and account details.
         </p>
       </div>
@@ -120,7 +120,7 @@ const CustomerDashboard = () => {
           {/* Name row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
                 First Name
               </label>
               <input
@@ -129,11 +129,11 @@ const CustomerDashboard = () => {
                 value={profile.first_name}
                 onChange={handleChange}
                 placeholder="Abebe"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+                className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 transition"
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
                 Last Name
               </label>
               <input
@@ -142,42 +142,42 @@ const CustomerDashboard = () => {
                 value={profile.last_name}
                 onChange={handleChange}
                 placeholder="Kebede"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+                className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 transition"
               />
             </div>
           </div>
 
           {/* Email — read-only */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
               Email Address <span className="normal-case font-normal">(cannot be changed)</span>
             </label>
             <input
               type="email"
               value={profile.email}
               disabled
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-400 cursor-not-allowed"
+              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-400 dark:text-slate-500 cursor-not-allowed"
             />
           </div>
 
           {/* Phone */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
               Phone Number
             </label>
             <input
-              type="text"
+              type="tel"
               name="phone_number"
               value={profile.phone_number}
               onChange={handleChange}
               placeholder="+251 911 000 000"
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+              className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 transition"
             />
           </div>
 
           {/* Address preview (editable here too for convenience) */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
               Delivery Address
             </label>
             <input
@@ -186,7 +186,7 @@ const CustomerDashboard = () => {
               value={profile.addresse}
               onChange={handleChange}
               placeholder="Sub-city, Woreda, House No..."
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+              className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 transition"
             />
           </div>
 

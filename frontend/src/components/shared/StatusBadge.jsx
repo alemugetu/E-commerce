@@ -40,11 +40,11 @@ const StatusBadge = ({ status, variant, size = 'sm' }) => {
   };
 
   const variantClasses = {
-    success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    danger: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-    info: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-    neutral: 'bg-slate-700 text-slate-400 border-slate-600',
+    success: 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 dark:border-emerald-500/30',
+    warning: 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/20 dark:border-amber-500/30',
+    danger: 'bg-rose-500/10 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border-rose-500/20 dark:border-rose-500/30',
+    info: 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 border-indigo-500/20 dark:border-indigo-500/30',
+    neutral: 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-400 border-slate-300 dark:border-slate-600',
   };
 
   const sizeClasses = {

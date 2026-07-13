@@ -25,9 +25,9 @@ const SuperuserProtectedRoute = () => {
   // Wait for session restoration before making routing decisions
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 gap-3">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 gap-3">
         <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-400 rounded-full animate-spin" />
-        <span className="text-sm text-slate-400 font-medium">Verifying superuser access…</span>
+        <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">Verifying superuser access…</span>
       </div>
     );
   }

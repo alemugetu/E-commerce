@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 html {
   scroll-behavior: smooth;
@@ -6,8 +8,14 @@ html {
 
 body {
   font-family: "Inter", sans-serif;
-  background-color: #FFFFFF;
-  color: #0F172A;
+  background-color: white;
+  color: rgb(15 23 42);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dark body {
+  background-color: rgb(2 6 23);
+  color: rgb(241 245 249);
 }
 
 h1,

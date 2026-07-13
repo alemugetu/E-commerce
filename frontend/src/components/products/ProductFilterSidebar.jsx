@@ -3,11 +3,11 @@ import { HiMagnifyingGlass, HiChevronDown, HiXMark } from 'react-icons/hi2';
 import { FaStar } from 'react-icons/fa';
 
 const AccordionSection = ({ title, isOpen, onToggle, children }) => (
-  <div className="border-b border-slate-100 last:border-b-0">
+  <div className="border-b border-slate-100 dark:border-slate-800 last:border-b-0">
     <button
       type="button"
       onClick={onToggle}
-      className="flex w-full items-center justify-between py-3 text-sm font-semibold text-slate-800 hover:text-emerald-600 transition-colors"
+      className="flex w-full items-center justify-between py-3 text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
       aria-expanded={isOpen}
     >
       {title}
@@ -50,14 +50,14 @@ const ProductFilterSidebar = ({
   }, [categories]);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 h-fit lg:sticky lg:top-24">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 h-fit lg:sticky lg:top-24">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-slate-900">Filters</h2>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Filters</h2>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onClearFilters}
-            className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
+            className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
           >
             Clear all
           </button>
@@ -65,7 +65,7 @@ const ProductFilterSidebar = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-1 rounded-lg text-slate-500 hover:bg-slate-100"
+              className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
               aria-label="Close filters"
             >
               <HiXMark className="w-5 h-5" />
@@ -76,7 +76,7 @@ const ProductFilterSidebar = ({
 
       <div className="relative mb-5">
         <HiMagnifyingGlass
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500"
           aria-hidden="true"
         />
         <input
@@ -84,20 +84,20 @@ const ProductFilterSidebar = ({
           value={filters.search}
           onChange={(e) => onFilterChange('search', e.target.value)}
           placeholder="Search products..."
-          className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+          className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 dark:focus:ring-emerald-900/20 transition"
         />
       </div>
 
       <div className="mb-5">
-        <h3 className="text-sm font-semibold text-slate-800 mb-3">Categories</h3>
+        <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">Categories</h3>
         <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
           <button
             type="button"
             onClick={() => onFilterChange('category', '')}
             className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
               !filters.category
-                ? 'bg-emerald-50 text-emerald-700 font-semibold'
-                : 'text-slate-600 hover:bg-slate-50'
+                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-semibold'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
           >
             All Categories
@@ -109,14 +109,14 @@ const ProductFilterSidebar = ({
               onClick={() => onFilterChange('category', category.slug)}
               className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                 filters.category === category.slug
-                  ? 'bg-emerald-50 text-emerald-700 font-semibold'
-                  : 'text-slate-600 hover:bg-slate-50'
+                  ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-semibold'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
               style={{ paddingLeft: `${12 + category.depth * 12}px` }}
             >
               {category.name}
               {category.product_count != null && (
-                <span className="text-slate-400 ml-1">({category.product_count})</span>
+                <span className="text-slate-400 dark:text-slate-500 ml-1">({category.product_count})</span>
               )}
             </button>
           ))}
@@ -135,7 +135,7 @@ const ProductFilterSidebar = ({
             value={filters.price_min}
             onChange={(e) => onFilterChange('price_min', e.target.value)}
             placeholder="Min"
-            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 dark:focus:ring-emerald-900/20"
           />
           <input
             type="number"
@@ -143,7 +143,7 @@ const ProductFilterSidebar = ({
             value={filters.price_max}
             onChange={(e) => onFilterChange('price_max', e.target.value)}
             placeholder="Max"
-            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 dark:focus:ring-emerald-900/20"
           />
         </div>
       </AccordionSection>
@@ -157,7 +157,7 @@ const ProductFilterSidebar = ({
           {[4, 3, 2, 1].map((rating) => (
             <label
               key={rating}
-              className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900"
+              className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
             >
               <input
                 type="radio"
@@ -174,7 +174,7 @@ const ProductFilterSidebar = ({
           <button
             type="button"
             onClick={() => onFilterChange('min_rating', '')}
-            className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+            className="text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium"
           >
             Any rating
           </button>
@@ -194,7 +194,7 @@ const ProductFilterSidebar = ({
           ].map((option) => (
             <label
               key={option.label}
-              className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900"
+              className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
             >
               <input
                 type="radio"
@@ -216,12 +216,12 @@ const ProductFilterSidebar = ({
       >
         <div className="space-y-2 max-h-40 overflow-y-auto">
           {brands.length === 0 ? (
-            <p className="text-xs text-slate-500">No brands available</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">No brands available</p>
           ) : (
             brands.map((brand) => (
               <label
                 key={brand}
-                className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900"
+                className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
               >
                 <input
                   type="radio"
@@ -238,7 +238,7 @@ const ProductFilterSidebar = ({
             <button
               type="button"
               onClick={() => onFilterChange('brand', '')}
-              className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+              className="text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium"
             >
               Any brand
             </button>

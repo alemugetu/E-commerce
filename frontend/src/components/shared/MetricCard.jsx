@@ -22,18 +22,18 @@ const MetricCard = ({
 }) => {
   if (loading) {
     return (
-      <div className="rounded-2xl border border-slate-800 bg-slate-800/40 p-5 animate-pulse">
-        <div className="h-3 w-28 rounded bg-slate-700 mb-4" />
-        <div className="h-7 w-20 rounded bg-slate-700" />
-        <div className="h-3 w-16 rounded bg-slate-700/60 mt-2" />
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/40 p-5 animate-pulse">
+        <div className="h-3 w-28 rounded bg-slate-300 dark:bg-slate-700 mb-4" />
+        <div className="h-7 w-20 rounded bg-slate-300 dark:bg-slate-700" />
+        <div className="h-3 w-16 rounded bg-slate-300/60 dark:bg-slate-700/60 mt-2" />
       </div>
     );
   }
 
   return (
-    <div className={`rounded-2xl border border-white/10 bg-gradient-to-br ${tone} p-5 text-white shadow-lg`}>
+    <div className={`rounded-2xl border border-white/10 dark:border-white/5 bg-gradient-to-br ${tone} p-5 text-white shadow-lg`}>
       <div className="flex items-start justify-between">
-        <p className="text-xs font-semibold text-white/75">{label}</p>
+        <p className="text-xs font-semibold text-white/90">{label}</p>
         {Icon && (
           typeof Icon === 'function' || (typeof Icon === 'object' && Icon.$$typeof) ? (
             <Icon className="w-6 h-6 opacity-60" />
@@ -43,7 +43,7 @@ const MetricCard = ({
         )}
       </div>
       <p className="mt-3 text-2xl font-black">{value}</p>
-      {subtitle && <p className="mt-1 text-xs text-white/60">{subtitle}</p>}
+      {subtitle && <p className="mt-1 text-xs text-white/70">{subtitle}</p>}
     </div>
   );
 };

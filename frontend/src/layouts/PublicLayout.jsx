@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 
 const PublicLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-white text-slate-950 font-body">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body">
 
       {/* Global Announcement Bar */}
       <div className="bg-emerald-600 text-white text-xs font-medium py-2 px-4 text-center">

@@ -8,6 +8,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { useStoreSettingsContext } from '../context/StoreSettingsContext';
 import { getInitials } from '../utils/getInitials';
 import { createPortal } from 'react-dom';
+import ThemeSelector from './common/ThemeSelector';
 
 const Navbar = () => {
   const { cartCount } = useCart();
@@ -52,7 +53,7 @@ const Navbar = () => {
   const initials = getInitials(user);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm">
+    <header className="sticky top-0 z-50 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
@@ -65,7 +66,7 @@ const Navbar = () => {
                 className="h-8 w-auto object-contain"
               />
             ) : (
-              <span className="text-2xl font-bold text-emerald-600 tracking-tight">
+              <span className="text-2xl font-bold text-primary tracking-tight">
                 {storeName}
               </span>
             )}
@@ -75,28 +76,28 @@ const Navbar = () => {
           <nav className="hidden md:flex items-center gap-8">
             <Link
               to="/"
-              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               <Home className="w-4 h-4" />
               Home
             </Link>
             <Link
               to="/products"
-              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               <Store className="w-4 h-4" />
               Products
             </Link>
             <Link
               to="/about"
-              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               <Info className="w-4 h-4" />
               About
             </Link>
             <Link
               to="/contact"
-              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               <Mail className="w-4 h-4" />
               Contact
@@ -105,13 +106,16 @@ const Navbar = () => {
 
           {/* Right Section - Icons & Auth */}
           <div className="flex items-center gap-4">
+            {/* Theme Selector */}
+            <ThemeSelector />
+            
             {/* Icons for authenticated users */}
             {user ? (
               <>
                 {/* Cart */}
                 <Link
                   to="/cart"
-                  className="relative p-2 text-slate-600 hover:text-emerald-600 transition-colors"
+                  className="relative p-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                   aria-label="Cart"
                 >
                   <ShoppingCart className="w-5 h-5" />
@@ -125,7 +129,7 @@ const Navbar = () => {
                 {/* Wishlist */}
                 <Link
                   to="/wishlist"
-                  className="relative p-2 text-slate-600 hover:text-emerald-600 transition-colors"
+                  className="relative p-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                   aria-label="Wishlist"
                 >
                   <Heart className="w-5 h-5" />
@@ -140,7 +144,7 @@ const Navbar = () => {
                 <div className="relative" ref={notificationsRef}>
                   <button
                     onClick={() => setNotificationsOpen(prev => !prev)}
-                    className="relative p-2 text-slate-600 hover:text-emerald-600 transition-colors"
+                    className="relative p-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                     aria-label="Notifications"
                   >
                     <Bell className="w-5 h-5" />
@@ -153,9 +157,9 @@ const Navbar = () => {
 
                   {/* Notifications Dropdown */}
                   {notificationsOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150 max-h-96 overflow-y-auto">
-                      <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                        <p className="text-sm font-semibold text-slate-900">Notifications</p>
+                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150 max-h-96 overflow-y-auto">
+                      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Notifications</p>
                         {unreadCount > 0 && (
                           <button
                             onClick={markAllAsRead}
@@ -169,19 +173,19 @@ const Navbar = () => {
 
                       {notifications.length === 0 ? (
                         <div className="px-4 py-6 text-center">
-                          <p className="text-sm text-slate-500">No notifications yet</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">No notifications yet</p>
                         </div>
                       ) : (
                         <div>
                           {notifications.map(notification => (
                             <div
                               key={notification.id}
-                              className={`px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors ${!notification.is_read ? 'bg-emerald-50/50' : ''}`}
+                              className={`px-4 py-3 border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${!notification.is_read ? 'bg-emerald-50/50 dark:bg-emerald-900/20' : ''}`}
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <div className="flex-1">
-                                  <p className="text-sm text-slate-900">{notification.message}</p>
-                                  <p className="text-xs text-slate-400 mt-1">
+                                  <p className="text-sm text-slate-900 dark:text-slate-100">{notification.message}</p>
+                                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                                     {new Date(notification.created_at).toLocaleString()}
                                   </p>
                                 </div>
@@ -189,7 +193,7 @@ const Navbar = () => {
                                   {!notification.is_read && (
                                     <button
                                       onClick={() => markAsRead(notification.id)}
-                                      className="p-1 text-emerald-600 hover:bg-emerald-100 rounded"
+                                      className="p-1 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded"
                                       aria-label="Mark as read"
                                     >
                                       <Check className="w-3 h-3" />
@@ -197,7 +201,7 @@ const Navbar = () => {
                                   )}
                                   <button
                                     onClick={() => removeNotification(notification.id)}
-                                    className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded"
+                                    className="p-1 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
                                     aria-label="Delete"
                                   >
                                     <Trash2 className="w-3 h-3" />
@@ -223,22 +227,22 @@ const Navbar = () => {
                     <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">
                       {initials}
                     </div>
-                    <User className="w-4 h-4 text-slate-600" />
+                    <User className="w-4 h-4 text-slate-600 dark:text-slate-400" />
                   </button>
 
                   {/* User Dropdown Menu */}
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
                       {/* User Info */}
-                      <div className="px-4 py-3 border-b border-slate-100">
-                        <p className="text-sm font-semibold text-slate-900 truncate">
+                      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
                           {user.first_name
                             ? `${user.first_name} ${user.last_name}`.trim()
                             : user.email}
                         </p>
-                        <p className="text-xs text-slate-500 truncate mt-0.5">{user.email}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">{user.email}</p>
                         {(user.is_staff || user.is_superuser) && (
-                          <span className="inline-block mt-1.5 text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded-full">
+                          <span className="inline-block mt-1.5 text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">
                             {user.is_superuser ? 'Superuser' : 'Staff'}
                           </span>
                         )}
@@ -249,7 +253,7 @@ const Navbar = () => {
                         <Link
                           to="/dashboard"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                         >
                           <User className="w-4 h-4" />
                           Profile
@@ -257,7 +261,7 @@ const Navbar = () => {
                         <Link
                           to="/order-history"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                         >
                           <ShoppingCart className="w-4 h-4" />
                           Orders
@@ -265,7 +269,7 @@ const Navbar = () => {
                         <Link
                           to="/wishlist"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                         >
                           <Heart className="w-4 h-4" />
                           Wishlist
@@ -301,7 +305,7 @@ const Navbar = () => {
               <div className="hidden md:flex items-center gap-3">
                 <Link
                   to="/login"
-                  className="text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
+                  className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                 >
                   Sign In
                 </Link>
@@ -317,7 +321,7 @@ const Navbar = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="md:hidden p-2 text-slate-600 hover:text-emerald-600 transition-colors"
+              className="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
@@ -340,14 +344,14 @@ const Navbar = () => {
           />
 
           {/* Drawer */}
-          <div className="absolute right-0 top-0 h-full w-72 bg-white shadow-xl z-10 ">
+          <div className="absolute right-0 top-0 h-full w-72 bg-white dark:bg-slate-900 shadow-xl z-10 ">
             <div className="flex flex-col h-full">
               {/* Drawer Header */}
-              <div className="flex items-center justify-between p-4 border-b border-slate-200">
-                <span className="text-lg font-bold text-emerald-600">{storeName}</span>
+              <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
+                <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{storeName}</span>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 text-slate-600 hover:text-emerald-600 transition-colors"
+                  className="p-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                 >
                   <X className="w-6 h-6" />
                 </button>

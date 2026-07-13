@@ -86,15 +86,15 @@ const Register = () => {
   };
 
   return (
-    <div className="flex justify-center items-center py-12">
+    <div className="flex justify-center items-center py-12 bg-slate-50 dark:bg-slate-900 min-h-screen">
       <Card className="w-full max-w-lg p-8">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Create an Account</h2>
-          <p className="text-slate-500 text-sm mt-2">Join STORE.ET to manage your orders and profile.</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Create an Account</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">Join STORE.ET to manage your orders and profile.</p>
         </div>
 
         {localError && (
-          <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700 font-medium text-center">
+          <div className="mb-6 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-400 font-medium text-center">
             {localError}
           </div>
         )}
@@ -186,9 +186,9 @@ const Register = () => {
           </Button>
         </form>
 
-        <div className="mt-8 text-center text-sm text-slate-600">
+        <div className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
           Already have an account?{' '}
-          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+          <Link to="/login" className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors">
             Sign in here
           </Link>
         </div>

@@ -39,8 +39,8 @@ const Contact = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Contact Us</h1>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-4">Contact Us</h1>
+        <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
           Have questions? We'd love to hear from you. Send us a message and we'll respond as soon
           as possible.
         </p>
@@ -49,8 +49,8 @@ const Contact = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* ── Contact Information ─────────────────────────────────────── */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-xl p-6 border border-slate-200">
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Get in Touch</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Get in Touch</h2>
 
             {settingsLoading ? (
               /* Skeleton while settings load */
@@ -74,10 +74,10 @@ const Contact = () => {
                       <Mail className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900">Email</h3>
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">Email</h3>
                       <a
                         href={`mailto:${companyEmail}`}
-                        className="text-slate-600 text-sm hover:text-emerald-600 transition-colors"
+                        className="text-slate-600 dark:text-slate-400 text-sm hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                       >
                         {companyEmail}
                       </a>
@@ -92,10 +92,10 @@ const Contact = () => {
                       <Phone className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900">Phone</h3>
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">Phone</h3>
                       <a
                         href={`tel:${companyPhone.replace(/\s/g, '')}`}
-                        className="text-slate-600 text-sm hover:text-emerald-600 transition-colors"
+                        className="text-slate-600 dark:text-slate-400 text-sm hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                       >
                         {companyPhone}
                       </a>
@@ -110,8 +110,8 @@ const Contact = () => {
                       <MapPin className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900">Address</h3>
-                      <p className="text-slate-600 text-sm whitespace-pre-line">{companyAddress}</p>
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">Address</h3>
+                      <p className="text-slate-600 dark:text-slate-400 text-sm whitespace-pre-line">{companyAddress}</p>
                     </div>
                   </div>
                 )}
@@ -122,8 +122,8 @@ const Contact = () => {
                     <Clock className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900">Business Hours</h3>
-                    <p className="text-slate-600 text-sm">
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-100">Business Hours</h3>
+                    <p className="text-slate-600 dark:text-slate-400 text-sm">
                       Mon – Fri: 9:00 AM – 6:00 PM
                       <br />
                       Sat: 10:00 AM – 4:00 PM
@@ -135,7 +135,7 @@ const Contact = () => {
 
                 {/* Fallback when no contact details are configured yet */}
                 {!companyEmail && !companyPhone && !companyAddress && (
-                  <p className="text-sm text-slate-400 italic">
+                  <p className="text-sm text-slate-400 dark:text-slate-500 italic">
                     Contact details have not been configured yet.
                   </p>
                 )}
@@ -144,32 +144,32 @@ const Contact = () => {
           </div>
 
           {/* FAQ Section */}
-          <div className="bg-emerald-50 rounded-xl p-6">
-            <h3 className="font-semibold text-slate-900 mb-4">Frequently Asked Questions</h3>
+          <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-6">
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-4">Frequently Asked Questions</h3>
             <div className="space-y-3 text-sm">
               <details>
-                <summary className="cursor-pointer font-medium text-slate-700 hover:text-emerald-600 transition-colors">
+                <summary className="cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   How can I track my order?
                 </summary>
-                <p className="mt-2 text-slate-600">
+                <p className="mt-2 text-slate-600 dark:text-slate-400">
                   Visit the Order History page in your dashboard or use the tracking number sent to
                   your email.
                 </p>
               </details>
               <details>
-                <summary className="cursor-pointer font-medium text-slate-700 hover:text-emerald-600 transition-colors">
+                <summary className="cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   What payment methods do you accept?
                 </summary>
-                <p className="mt-2 text-slate-600">
+                <p className="mt-2 text-slate-600 dark:text-slate-400">
                   We accept Chapa payment, bank transfers, and mobile money. All transactions are
                   secure and encrypted.
                 </p>
               </details>
               <details>
-                <summary className="cursor-pointer font-medium text-slate-700 hover:text-emerald-600 transition-colors">
+                <summary className="cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   How do I return an item?
                 </summary>
-                <p className="mt-2 text-slate-600">
+                <p className="mt-2 text-slate-600 dark:text-slate-400">
                   Contact our support team within 7 days of delivery. We'll guide you through the
                   return process.
                 </p>
@@ -180,13 +180,13 @@ const Contact = () => {
 
         {/* ── Contact Form ────────────────────────────────────────────── */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl p-6 md:p-8 border border-slate-200">
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Send us a Message</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-6 md:p-8 border border-slate-200 dark:border-slate-800">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Send us a Message</h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+                  <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Name *
                   </label>
                   <input
@@ -196,12 +196,12 @@ const Contact = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
+                    className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 outline-none transition-colors"
                     placeholder="Your full name"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Email *
                   </label>
                   <input
@@ -211,14 +211,14 @@ const Contact = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
+                    className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 outline-none transition-colors"
                     placeholder="your@email.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-slate-700 mb-2">
+                <label htmlFor="subject" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Subject *
                 </label>
                 <input
@@ -228,13 +228,13 @@ const Contact = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 outline-none transition-colors"
                   placeholder="How can we help you?"
                 />
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-slate-700 mb-2">
+                <label htmlFor="message" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Message *
                 </label>
                 <textarea
@@ -244,7 +244,7 @@ const Contact = () => {
                   onChange={handleChange}
                   required
                   rows={6}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors resize-none"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 outline-none transition-colors resize-none"
                   placeholder="Tell us more about your inquiry..."
                 />
               </div>
@@ -273,12 +273,12 @@ const Contact = () => {
 
       {/* Map Placeholder */}
       <div className="mt-12">
-        <div className="bg-slate-100 rounded-xl h-64 md:h-80 flex items-center justify-center border border-slate-200">
+        <div className="bg-slate-100 dark:bg-slate-800 rounded-xl h-64 md:h-80 flex items-center justify-center border border-slate-200 dark:border-slate-700">
           <div className="text-center">
-            <MapPin className="w-12 h-12 text-slate-400 mx-auto mb-2" />
-            <p className="text-slate-600 font-medium">Interactive Map</p>
+            <MapPin className="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto mb-2" />
+            <p className="text-slate-600 dark:text-slate-400 font-medium">Interactive Map</p>
             {companyAddress && (
-              <p className="text-slate-500 text-sm mt-1 max-w-xs mx-auto">{companyAddress}</p>
+              <p className="text-slate-500 dark:text-slate-500 text-sm mt-1 max-w-xs mx-auto">{companyAddress}</p>
             )}
           </div>
         </div>

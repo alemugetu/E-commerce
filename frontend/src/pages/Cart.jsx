@@ -38,8 +38,8 @@ const Cart = () => {
     return (
       <div className="max-w-md mx-auto px-4 py-24 text-center">
         <ShoppingCart className="w-20 h-20 mx-auto mb-4 text-indigo-500" />
-        <h2 className="text-2xl font-bold text-slate-900">Your Cart is Empty</h2>
-        <p className="text-slate-500 text-sm mt-2">Looks like you haven't added any hardware to your order yet.</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Your Cart is Empty</h2>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">Looks like you haven't added any hardware to your order yet.</p>
         <Button variant="primary" className="mt-6 w-full" onClick={() => navigate('/')}>
           Return to Marketplace
         </Button>
@@ -49,7 +49,7 @@ const Cart = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-8">Shopping Cart ({cartCount} items)</h1>
+      <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mb-8">Shopping Cart ({cartCount} items)</h1>
 
       {checkoutError && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-medium flex items-center gap-2">
@@ -77,26 +77,26 @@ const Cart = () => {
                 </div>
 
                 <div className="flex-1 text-center sm:text-left">
-                  <h3 className="font-bold text-slate-900 text-base line-clamp-1">{item.name}</h3>
-                  <p className="text-xs text-indigo-600 font-medium mt-0.5">{item.category_detail?.name || "General"}</p>
-                  <p className="text-sm font-black text-slate-900 mt-2">{item.price} ETB</p>
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base line-clamp-1">{item.name}</h3>
+                  <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">{item.category_detail?.name || "General"}</p>
+                  <p className="text-sm font-black text-slate-900 dark:text-slate-100 mt-2">{item.price} ETB</p>
                 </div>
 
-                <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden bg-white">
+                <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-900">
                   <button 
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
                     disabled={isProcessing}
-                    className="px-3 py-1 bg-slate-50 text-slate-600 hover:bg-slate-100 font-bold transition-colors disabled:opacity-50"
+                    className="px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold transition-colors disabled:opacity-50"
                   >
                     -
                   </button>
-                  <span className="px-4 text-sm font-bold text-slate-800 min-w-[24px] text-center">
+                  <span className="px-4 text-sm font-bold text-slate-800 dark:text-slate-200 min-w-[24px] text-center">
                     {item.quantity}
                   </span>
                   <button 
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
                     disabled={isProcessing}
-                    className="px-3 py-1 bg-slate-50 text-slate-600 hover:bg-slate-100 font-bold transition-colors disabled:opacity-50"
+                    className="px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold transition-colors disabled:opacity-50"
                   >
                     +
                   </button>
@@ -105,7 +105,7 @@ const Cart = () => {
                 <button 
                   onClick={() => removeFromCart(item.id)}
                   disabled={isProcessing}
-                  className="text-slate-400 hover:text-red-500 p-2 transition-colors text-sm font-medium sm:ml-2 disabled:opacity-50"
+                  className="text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors text-sm font-medium sm:ml-2 disabled:opacity-50"
                 >
                   Remove
                 </button>
@@ -115,23 +115,23 @@ const Cart = () => {
         </div>
 
         {/* Right Side: Order Summary Panel */}
-        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-          <h2 className="text-lg font-bold text-slate-900 mb-4">Order Summary</h2>
+        <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">Order Summary</h2>
           
-          <div className="space-y-3 pb-4 border-b border-slate-200 text-sm">
-            <div className="flex justify-between text-slate-600">
+          <div className="space-y-3 pb-4 border-b border-slate-200 dark:border-slate-800 text-sm">
+            <div className="flex justify-between text-slate-600 dark:text-slate-400">
               <span>Subtotal</span>
-              <span className="font-semibold text-slate-900">{cartTotal.toFixed(2)} ETB</span>
+              <span className="font-semibold text-slate-900 dark:text-slate-100">{cartTotal.toFixed(2)} ETB</span>
             </div>
-            <div className="flex justify-between text-slate-600">
+            <div className="flex justify-between text-slate-600 dark:text-slate-400">
               <span>Shipping / Delivery</span>
-              <span className="text-emerald-600 font-medium">Calculated next</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Calculated next</span>
             </div>
           </div>
 
           <div className="flex justify-between items-center pt-4 mb-6">
-            <span className="text-base font-bold text-slate-900">Total Balance</span>
-            <span className="text-2xl font-black text-slate-900">{cartTotal.toFixed(2)} ETB</span>
+            <span className="text-base font-bold text-slate-900 dark:text-slate-100">Total Balance</span>
+            <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{cartTotal.toFixed(2)} ETB</span>
           </div>
 
           {/* 4. ATTACH THE MUTATION FUNCTION AND DISABLE DRIVERS WHILE RUNNING */}

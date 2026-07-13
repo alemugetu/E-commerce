@@ -83,18 +83,18 @@ const SuperuserDashboard = () => {
 
       {/* ── Header ── */}
       <div>
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-400">System Admin</p>
-        <h1 className="mt-1 text-2xl font-black text-slate-100">
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-600 dark:text-purple-400">System Admin</p>
+        <h1 className="mt-1 text-2xl font-black text-slate-900 dark:text-slate-100">
           Welcome back, {displayName.split(' ')[0]} 👋
         </h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Platform-wide overview and system health monitoring.
         </p>
       </div>
 
       {/* ── Error ── */}
       {error && (
-        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">
+        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-400">
           {error}
           <button
             onClick={loadMetrics}
@@ -124,7 +124,7 @@ const SuperuserDashboard = () => {
 
       {/* ── Quick Actions ── */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-        <p className="text-sm font-bold text-slate-200 mb-4">Quick Actions</p>
+        <p className="text-sm font-bold text-slate-900 dark:text-slate-200 mb-4">Quick Actions</p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {quickActions.map(action => (
             <Link
@@ -144,7 +144,7 @@ const SuperuserDashboard = () => {
 
         {/* Platform Stats */}
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <p className="text-sm font-bold text-slate-200 mb-4">Platform Statistics</p>
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-200 mb-4">Platform Statistics</p>
           {loading ? (
             <LoadingSkeleton count={4} className="h-6 mb-3" />
           ) : (
@@ -156,10 +156,10 @@ const SuperuserDashboard = () => {
                 { label: 'Platform Revenue',   value: `ETB ${Number(metrics?.total_sales ?? 0).toLocaleString()}`, color: 'bg-amber-500' },
               ].map(item => (
                 <div key={item.label} className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400">{item.label}</span>
+                  <span className="text-xs text-slate-600 dark:text-slate-400">{item.label}</span>
                   <div className="flex items-center gap-2">
                     <div className={`h-2 w-2 rounded-full ${item.color}`} />
-                    <span className="text-sm font-bold text-slate-200">{item.value}</span>
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-200">{item.value}</span>
                   </div>
                 </div>
               ))}
@@ -169,7 +169,7 @@ const SuperuserDashboard = () => {
 
         {/* Recent Activity Placeholder */}
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <p className="text-sm font-bold text-slate-200 mb-4">System Alerts</p>
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-200 mb-4">System Alerts</p>
           <div className="space-y-3">
             {metrics && metrics.pending_customers > 0 && (
               <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
@@ -200,7 +200,7 @@ const SuperuserDashboard = () => {
             {(!metrics || (metrics.pending_customers === 0 && metrics.out_of_stock_products === 0)) && (
               <div className="py-8 text-center">
                 <CheckCircle className="w-10 h-10 mx-auto mb-2 text-emerald-400" />
-                <p className="text-xs text-slate-500">All systems operational</p>
+                <p className="text-xs text-slate-500 dark:text-slate-500">All systems operational</p>
               </div>
             )}
           </div>

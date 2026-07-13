@@ -12,14 +12,14 @@ const Card = ({
     <div
       onClick={onClick}
       className={`
-        bg-white
-        border border-slate-200
+        bg-white dark:bg-slate-900
+        border border-slate-200 dark:border-slate-800
         rounded-xl
         shadow-sm
         overflow-hidden
         transition-all
         duration-200
-        ${isClickable ? "cursor-pointer hover:shadow-md hover:border-slate-300" : ""}
+        ${isClickable ? "cursor-pointer hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700" : ""}
         ${className}
       `}
     >

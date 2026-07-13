@@ -22,8 +22,8 @@ const INITIAL_FORM = {
   footer_description: '', copyright_text: '', meta_title: '', meta_description: '',
 };
 
-const inputCls = 'w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/40 transition';
-const labelCls = 'mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400';
+const inputCls = 'w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/80 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none focus:border-purple-500 dark:focus:border-purple-500 focus:ring-1 focus:ring-purple-500/40 transition';
+const labelCls = 'mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400';
 
 const SECTION_TABS = [
   { id: 'company',  label: 'Company Info' },
@@ -113,12 +113,12 @@ const SuperuserSettings = () => {
     return (
       <div className="space-y-6">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-400">Configuration</p>
-          <h1 className="mt-1 text-2xl font-black text-slate-100">Store Settings</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-600 dark:text-purple-400">Configuration</p>
+          <h1 className="mt-1 text-2xl font-black text-slate-900 dark:text-slate-100">Store Settings</h1>
         </div>
         <div className="space-y-4 animate-pulse">
           {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="h-12 rounded-xl bg-slate-800/60" />
+            <div key={i} className="h-12 rounded-xl bg-slate-200 dark:bg-slate-800/60" />
           ))}
         </div>
       </div>
@@ -132,7 +132,7 @@ const SuperuserSettings = () => {
       <div>
         <p className="text-xs font-bold uppercase tracking-[0.3em] text-purple-400">Configuration</p>
         <h1 className="mt-1 text-2xl font-black text-slate-100">Store Settings</h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Manage company information, social media, branding, and SEO. Changes reflect across the public site immediately.
         </p>
       </div>
@@ -146,7 +146,7 @@ const SuperuserSettings = () => {
             className={`flex-shrink-0 rounded-lg px-4 py-2 text-xs font-bold transition ${
               activeSection === tab.id
                 ? 'bg-purple-600 text-white'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             {tab.label}
@@ -159,7 +159,7 @@ const SuperuserSettings = () => {
         {/* ── Company Info ─────────────────────────────────────────────── */}
         {activeSection === 'company' && (
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 space-y-4">
-            <h2 className="text-base font-bold text-slate-100">Company Information</h2>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Company Information</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className={labelCls}>Company Name</label>
@@ -194,18 +194,18 @@ const SuperuserSettings = () => {
         {/* ── Branding ─────────────────────────────────────────────────── */}
         {activeSection === 'branding' && (
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 space-y-6">
-            <h2 className="text-base font-bold text-slate-100">Branding</h2>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Branding</h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label className={labelCls}>Company Logo</label>
                 {currentLogoUrl && (
                   <img src={currentLogoUrl} alt="Current logo"
-                    className="mb-2 h-12 w-auto object-contain rounded bg-slate-800 p-1" />
+                    className="mb-2 h-12 w-auto object-contain rounded bg-slate-200 dark:bg-slate-800 p-1" />
                 )}
                 <input type="file" accept="image/*"
                   onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)}
-                  className="block w-full text-xs text-slate-400 file:mr-3 file:rounded-full file:border-0 file:bg-purple-600/20 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-purple-300 hover:file:bg-purple-600/30 cursor-pointer" />
-                <p className="mt-1 text-[10px] text-slate-500">Leave blank to keep the current logo.</p>
+                  className="block w-full text-xs text-slate-600 dark:text-slate-400 file:mr-3 file:rounded-full file:border-0 file:bg-purple-600/20 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-purple-700 dark:file:text-purple-300 hover:file:bg-purple-600/30 cursor-pointer" />
+                <p className="mt-1 text-[10px] text-slate-600 dark:text-slate-500">Leave blank to keep the current logo.</p>
               </div>
               <div>
                 <label className={labelCls}>Favicon</label>
@@ -215,8 +215,8 @@ const SuperuserSettings = () => {
                 )}
                 <input type="file" accept="image/*"
                   onChange={(e) => setFaviconFile(e.target.files?.[0] ?? null)}
-                  className="block w-full text-xs text-slate-400 file:mr-3 file:rounded-full file:border-0 file:bg-purple-600/20 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-purple-300 hover:file:bg-purple-600/30 cursor-pointer" />
-                <p className="mt-1 text-[10px] text-slate-500">Leave blank to keep the current favicon.</p>
+                  className="block w-full text-xs text-slate-600 dark:text-slate-400 file:mr-3 file:rounded-full file:border-0 file:bg-purple-600/20 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-purple-700 dark:file:text-purple-300 hover:file:bg-purple-600/30 cursor-pointer" />
+                <p className="mt-1 text-[10px] text-slate-600 dark:text-slate-500">Leave blank to keep the current favicon.</p>
               </div>
             </div>
           </section>
@@ -226,8 +226,8 @@ const SuperuserSettings = () => {
         {activeSection === 'social' && (
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 space-y-4">
             <div>
-              <h2 className="text-base font-bold text-slate-100">Social Media</h2>
-              <p className="text-xs text-slate-400 mt-1">
+              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Social Media</h2>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                 Enter the full URL. Leave blank to hide that icon on the public site.
               </p>
             </div>
@@ -255,7 +255,7 @@ const SuperuserSettings = () => {
         {/* ── Footer & SEO ──────────────────────────────────────────────── */}
         {activeSection === 'seo' && (
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 space-y-4">
-            <h2 className="text-base font-bold text-slate-100">Footer & SEO</h2>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Footer & SEO</h2>
             <div>
               <label className={labelCls}>Footer Description</label>
               <textarea name="footer_description" value={form.footer_description}
