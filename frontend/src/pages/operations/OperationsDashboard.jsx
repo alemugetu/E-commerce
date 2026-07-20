@@ -1,7 +1,10 @@
 import React from 'react';
 import { MetricCard } from '../../components/shared';
+import { useAuth } from '../../context/AuthContext';
 
 const OperationsDashboard = () => {
+  const { permissions } = useAuth();
+
   return (
     <div className="space-y-8">
       <div>
@@ -15,10 +18,24 @@ const OperationsDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Total Products" value="—" tone="from-purple-500 to-purple-700" />
-        <MetricCard label="Total Orders" value="—" tone="from-emerald-500 to-teal-600" />
-        <MetricCard label="Pending Tasks" value="—" tone="from-amber-500 to-orange-500" />
-        <MetricCard label="Active Users" value="—" tone="from-indigo-500 to-indigo-700" />
+        {permissions.includes('view_product') && (
+          <MetricCard label="Total Products" value="—" tone="from-purple-500 to-purple-700" />
+        )}
+        {permissions.includes('view_order') && (
+          <MetricCard label="Total Orders" value="—" tone="from-emerald-500 to-teal-600" />
+        )}
+        {permissions.includes('view_inventory') && (
+          <MetricCard label="Inventory Status" value="—" tone="from-amber-500 to-orange-500" />
+        )}
+        {permissions.includes('view_customuser') && (
+          <MetricCard label="Active Users" value="—" tone="from-indigo-500 to-indigo-700" />
+        )}
+        {permissions.includes('view_reports') && (
+          <MetricCard label="Financial Reports" value="—" tone="from-pink-500 to-rose-600" />
+        )}
+        {permissions.includes('view_category') && (
+          <MetricCard label="Categories" value="—" tone="from-cyan-500 to-sky-600" />
+        )}
       </div>
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">

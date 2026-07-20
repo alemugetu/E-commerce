@@ -10,6 +10,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import SellerProtectedRoute from './components/auth/SellerProtectedRoute';
 import SuperuserProtectedRoute from './components/auth/SuperuserProtectedRoute';
 import OperationsProtectedRoute from './components/auth/OperationsProtectedRoute';
+import PermissionProtectedRoute from './components/auth/PermissionProtectedRoute';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -133,15 +134,15 @@ const AppRouter = () => {
       <Route path="/operations" element={<OperationsProtectedRoute />}>
         <Route element={<OperationsLayout />}>
           <Route index                element={<OperationsDashboard />} />
-          <Route path="products"       element={<OperationsProducts />} />
-          <Route path="inventory"      element={<OperationsInventory />} />
-          <Route path="orders"         element={<OperationsOrders />} />
-          <Route path="customers"      element={<OperationsCustomers />} />
-          <Route path="finance"        element={<OperationsFinance />} />
-          <Route path="marketing"      element={<OperationsMarketing />} />
-          <Route path="support"        element={<OperationsSupport />} />
-          <Route path="delivery"       element={<OperationsDelivery />} />
-          <Route path="content"        element={<OperationsContent />} />
+          <Route path="products"       element={<PermissionProtectedRoute requiredPermissions={['view_product']}><OperationsProducts /></PermissionProtectedRoute>} />
+          <Route path="inventory"      element={<PermissionProtectedRoute requiredPermissions={['view_inventory']}><OperationsInventory /></PermissionProtectedRoute>} />
+          <Route path="orders"         element={<PermissionProtectedRoute requiredPermissions={['view_order']}><OperationsOrders /></PermissionProtectedRoute>} />
+          <Route path="customers"      element={<PermissionProtectedRoute requiredPermissions={['view_customuser']}><OperationsCustomers /></PermissionProtectedRoute>} />
+          <Route path="finance"        element={<PermissionProtectedRoute requiredPermissions={['view_reports']}><OperationsFinance /></PermissionProtectedRoute>} />
+          <Route path="marketing"      element={<PermissionProtectedRoute requiredPermissions={['view_category']}><OperationsMarketing /></PermissionProtectedRoute>} />
+          <Route path="support"        element={<PermissionProtectedRoute requiredPermissions={['change_customuser']}><OperationsSupport /></PermissionProtectedRoute>} />
+          <Route path="delivery"       element={<PermissionProtectedRoute requiredPermissions={['change_order']}><OperationsDelivery /></PermissionProtectedRoute>} />
+          <Route path="content"        element={<PermissionProtectedRoute requiredPermissions={['add_category']}><OperationsContent /></PermissionProtectedRoute>} />
         </Route>
       </Route>
 
