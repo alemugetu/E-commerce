@@ -18,7 +18,7 @@ from django.utils import timezone
 
 from apps_auth.permissions import IsSeller, IsSuperuser
 from products.serializers import ProductImageSerializer, ProductSerializer
-from products.models import Product
+from products.models import Product, ProductImage
 from orders.models import Order
 from .models import AuditLog
 from .serializers import AuditLogSerializer
@@ -120,7 +120,18 @@ class SellerProductManagementView(APIView):
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            product = serializer.save()
+            
+            # Handle image upload if provided
+            image_file = request.FILES.get('image')
+            if image_file:
+                ProductImage.objects.create(
+                    product=product,
+                    image=image_file,
+                    is_feature=True,
+                    alt_text=request.data.get('alt_text', product.name),
+                )
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -133,6 +144,17 @@ class SellerProductManagementView(APIView):
         serializer = ProductSerializer(product, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            
+            # Handle image upload if provided
+            image_file = request.FILES.get('image')
+            if image_file:
+                ProductImage.objects.create(
+                    product=product,
+                    image=image_file,
+                    is_feature=True,
+                    alt_text=request.data.get('alt_text', product.name),
+                )
+            
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

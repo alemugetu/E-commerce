@@ -83,6 +83,24 @@ class ProductSerializer(serializers.ModelSerializer):
             'is_active', 'images', 'rating', 'num_reviews', 'created_at', 'updated_at'
         ]
         read_only_fields = ['slug', 'created_at', 'updated_at']
+        extra_kwargs = {
+            'is_available': {'default': True},
+            'is_active': {'default': True},
+        }
+
+    def to_internal_value(self, data):
+        """
+        Handle string-to-boolean conversion for FormData submissions.
+        FormData sends booleans as strings "true"/"false".
+        """
+        if hasattr(data, 'get'):
+            if 'is_available' in data:
+                if isinstance(data['is_available'], str):
+                    data['is_available'] = data['is_available'].lower() in ('true', '1', 'yes')
+            if 'is_active' in data:
+                if isinstance(data['is_active'], str):
+                    data['is_active'] = data['is_active'].lower() in ('true', '1', 'yes')
+        return super().to_internal_value(data)
 
     # 🛠️ SENIOR FIX: Auto-populate the slug from the name before database write validation triggers
     def create(self, validated_data):

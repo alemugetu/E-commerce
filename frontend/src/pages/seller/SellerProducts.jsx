@@ -128,6 +128,7 @@ const SellerProducts = () => {
     fd.append('category', categoryId);
     fd.append('brand', formData.brand);
     fd.append('is_available', String(formData.is_available));
+    fd.append('is_active', 'true');
     if (formData.discount_price) fd.append('discount_price', formData.discount_price);
     if (selectedFile) fd.append('image', selectedFile);
 
@@ -140,7 +141,7 @@ const SellerProducts = () => {
         toast.success(`"${formData.name}" updated successfully.`);
       } else {
         // ── Create new product ──
-        const { data } = await api.post('/products/', fd, {
+        const { data } = await api.post('/seller/products/', fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         toast.success(`"${data.name}" added to the catalog.`);

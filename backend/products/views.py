@@ -34,7 +34,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     Features:
     - Public users can browse products.
-    - Admin users manage products.
+    - Superusers and sellers manage products.
     - Pagination support.
     - Search support.
     - Category and field filtering.
@@ -85,14 +85,15 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def check_permissions(self, request):
         """
-        Additional check: only superusers can modify products.
+        Additional check: superusers and sellers can modify products.
         """
         super().check_permissions(request)
-        if self.action not in ['list', 'retrieve'] and not request.user.is_superuser:
-            self.permission_denied(
-                request,
-                message='Only superusers can manage products.'
-            )
+        if self.action not in ['list', 'retrieve']:
+            if not request.user.is_superuser and not request.user.groups.filter(name='Seller').exists():
+                self.permission_denied(
+                    request,
+                    message='Only superusers and sellers can manage products.'
+                )
 
     def get_queryset(self):
         """
