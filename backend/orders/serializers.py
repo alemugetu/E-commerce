@@ -96,6 +96,7 @@ class OrderSerializer(serializers.ModelSerializer):
     customer_email = serializers.ReadOnlyField(source='user.email')
     customer_phone = serializers.ReadOnlyField(source='user.phone_number')
     customer_address = serializers.ReadOnlyField(source='user.addresse')
+    status_choices = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -108,6 +109,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'customer_address',
             'total_amount',
             'status',
+            'status_choices',
             'tx_ref',
             'created_at',
             'updated_at',
@@ -131,6 +133,10 @@ class OrderSerializer(serializers.ModelSerializer):
         if user.first_name and user.last_name:
             return f"{user.first_name} {user.last_name}"
         return user.email or "Unknown"
+
+    def get_status_choices(self, obj):
+        # Expose available status choices for frontend dropdown
+        return [choice[0] for choice in Order.STATUS_CHOICES]
     
 
 class NotificationSerializer(serializers.ModelSerializer):

@@ -74,7 +74,6 @@ INSTALLED_APPS = [
     'apps_auth',
     'orders',
     'products',
-    'apps_products',
     'payments',
     'custom_admin',
     'site_settings',

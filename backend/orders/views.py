@@ -347,10 +347,16 @@ class OrderStatusUpdateView(APIView):
 
         old_status = order.status
         order.status = new_status
+        
+        # Payment status (is_paid) should only change when explicitly set to Paid
+        # Fulfillment status changes (Shipped, Delivered) should not affect payment status
         if new_status == 'Paid':
             order.is_paid = True
+        # Only reset is_paid when order is cancelled or set back to pending
         elif new_status in {'Cancelled', 'Pending'}:
             order.is_paid = False
+        # For other fulfillment status changes (Processing, Shipped, Delivered), 
+        # preserve the existing payment status (is_paid)
 
         order.save(update_fields=['status', 'is_paid', 'updated_at'])
 

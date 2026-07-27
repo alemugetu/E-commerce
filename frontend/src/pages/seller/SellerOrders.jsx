@@ -15,6 +15,7 @@ const SellerOrders = () => {
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState({ hasNext: false, hasPrev: false, total: 0 });
   const [updatingId, setUpdatingId] = useState(null);
+  const [statusOptions, setStatusOptions] = useState([]);
 
   const loadOrders = useCallback(async (targetPage) => {
     setLoading(true);
@@ -26,6 +27,10 @@ const SellerOrders = () => {
         hasPrev: !!data.previous,
         total: data.count ?? 0,
       });
+      // Extract status choices from the first order if available
+      if (data.results && data.results.length > 0 && data.results[0].status_choices) {
+        setStatusOptions(data.results[0].status_choices);
+      }
     } catch {
       toast.error('Failed to load orders.');
     } finally {
@@ -50,8 +55,6 @@ const SellerOrders = () => {
     }
   };
 
-  const statusOptions = ['Pending', 'Processing', 'Paid', 'Shipped', 'Delivered', 'Cancelled'];
-
   const columns = [
     {
       key: 'id',
@@ -59,16 +62,34 @@ const SellerOrders = () => {
       render: (val) => <span className="font-mono text-slate-900 dark:text-slate-200">#{val}</span>,
     },
     {
-      key: 'user',
+      key: 'items',
+      label: 'Order',
+      render: (items) => {
+        if (!items || items.length === 0) return <span className="text-sm text-slate-600 dark:text-slate-500">No items</span>;
+        const firstItem = items[0];
+        const productName = firstItem.product_name || 'Product';
+        if (items.length === 1) {
+          return <span className="text-sm font-medium text-slate-900 dark:text-slate-200">{productName}</span>;
+        }
+        return (
+          <div>
+            <span className="text-sm font-medium text-slate-900 dark:text-slate-200">{productName}</span>
+            <span className="text-xs text-slate-600 dark:text-slate-500 ml-1">+{items.length - 1} more</span>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'customer_name',
       label: 'Customer',
-      render: (val) => (
+      render: (val, row) => (
         <div>
           <p className="text-sm font-semibold text-slate-900 dark:text-slate-200">
-            {val?.first_name || val?.last_name
-              ? `${val.first_name || ''} ${val.last_name || ''}`.trim()
-              : 'Customer'}
+            {val || 'Customer'}
           </p>
-          <p className="text-xs text-slate-600 dark:text-slate-500">{val?.email}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-500">{row.customer_email}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-500">{row.customer_phone}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-500">{row.customer_address}</p>
         </div>
       ),
     },
