@@ -104,7 +104,7 @@ const SellerOrders = () => {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: 'Fulfillment',
       render: (val, row) => (
         <div className="flex items-center gap-2">
           <StatusBadge status={val} />
@@ -112,6 +112,19 @@ const SellerOrders = () => {
             <div className="w-3 h-3 border border-slate-600 dark:border-slate-600 border-t-emerald-500 rounded-full animate-spin" />
           )}
         </div>
+      ),
+    },
+    {
+      key: 'payment_status',
+      label: 'Payment',
+      render: (val) => (
+        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+          val === 'Paid' 
+            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' 
+            : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+        }`}>
+          {val}
+        </span>
       ),
     },
     {
@@ -156,7 +169,7 @@ const SellerOrders = () => {
           { label: 'Total Orders', value: meta.total, color: 'border-indigo-600' },
           { label: 'Pending', value: orders.filter(o => o.status === 'Pending').length, color: 'border-amber-600' },
           { label: 'Processing', value: orders.filter(o => o.status === 'Processing').length, color: 'border-indigo-600' },
-          { label: 'Paid', value: orders.filter(o => o.status === 'Paid').length, color: 'border-emerald-600' },
+          { label: 'Paid', value: orders.filter(o => o.is_paid).length, color: 'border-emerald-600' },
         ].map(stat => (
           <div key={stat.label} className={`rounded-xl border-l-4 ${stat.color} bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-4`}>
             <p className="text-xs text-slate-600 dark:text-slate-500 uppercase tracking-wider">{stat.label}</p>

@@ -45,7 +45,7 @@ def revenue_over_time(start_date, end_date, granularity='day'):
 
     qs = (
         Order.objects
-        .filter(status='Paid', created_at__date__gte=start_date, created_at__date__lte=end_date)
+        .filter(is_paid=True, created_at__date__gte=start_date, created_at__date__lte=end_date)
         .annotate(period=trunc_fn('created_at'))
         .values('period')
         .annotate(revenue=Sum('total_amount'), orders=Count('id'))
@@ -72,7 +72,7 @@ def top_products(start_date, end_date, limit=10):
 
     qs = (
         OrderItem.objects
-        .filter(order__status='Paid', order__created_at__date__gte=start_date, order__created_at__date__lte=end_date)
+        .filter(order__is_paid=True, order__created_at__date__gte=start_date, order__created_at__date__lte=end_date)
         .values('product__id', 'product__name')
         .annotate(
             units_sold=Sum('quantity'),
@@ -150,7 +150,7 @@ def platform_summary(start_date, end_date):
     from orders.models import Order
 
     paid_orders = Order.objects.filter(
-        status='Paid',
+        is_paid=True,
         created_at__date__gte=start_date,
         created_at__date__lte=end_date,
     )

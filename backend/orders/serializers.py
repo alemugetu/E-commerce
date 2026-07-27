@@ -97,6 +97,7 @@ class OrderSerializer(serializers.ModelSerializer):
     customer_phone = serializers.ReadOnlyField(source='user.phone_number')
     customer_address = serializers.ReadOnlyField(source='user.addresse')
     status_choices = serializers.SerializerMethodField()
+    payment_status = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -110,6 +111,8 @@ class OrderSerializer(serializers.ModelSerializer):
             'total_amount',
             'status',
             'status_choices',
+            'payment_status',
+            'is_paid',
             'tx_ref',
             'created_at',
             'updated_at',
@@ -137,6 +140,12 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_status_choices(self, obj):
         # Expose available status choices for frontend dropdown
         return [choice[0] for choice in Order.STATUS_CHOICES]
+
+    def get_payment_status(self, obj):
+        # Return payment status based on is_paid flag
+        if obj.is_paid:
+            return 'Paid'
+        return 'Pending'
     
 
 class NotificationSerializer(serializers.ModelSerializer):
