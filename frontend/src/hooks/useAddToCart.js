@@ -35,15 +35,8 @@ export const useAddToCart = () => {
     try {
       if (user) {
         // ── Authenticated path ──────────────────────────────────────────
-        // POST to the backend so the DB cart matches what Chapa will charge.
-        await api.post('/orders/cart/', {
-          product_id: product.id,
-          quantity,
-        });
-
-        // Mirror into local context so the navbar badge increments instantly
-        // without waiting for a full cart refetch.
-        addToCart(product, quantity);
+        // CartContext.addToCart handles the backend API call and state update
+        await addToCart(product, quantity);
 
         toast.success(`"${product.name}" added to cart`, {
           icon: '🛒',
